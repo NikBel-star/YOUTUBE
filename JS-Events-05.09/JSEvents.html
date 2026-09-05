@@ -321,13 +321,18 @@
 
   /* Sections */
   .sections {
-    margin-top: 60px;
+    margin-top: 0;
     display: flex;
     flex-direction: column;
     gap: 22px;
   }
 
+  .sections.has-selection {
+    margin-top: 24px;
+  }
+
   .section {
+    display: none;
     position: relative;
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -335,6 +340,10 @@
     padding: 24px 26px;
     scroll-margin-top: 84px;
     --cat: #7fd6a8;
+  }
+
+  .section.visible {
+    display: block;
   }
 
   .section-title {
@@ -487,7 +496,7 @@
     <div class="grid" id="grid"></div>
   </section>
 
-  <div class="section-label" data-i18n="detailLabel">დეტალური მიმოხილვა</div>
+  <div class="section-label" id="detailLabel" data-i18n="detailLabel" style="display:none">დეტალური მიმოხილვა</div>
   <div class="sections" id="sections"></div>
 </div>
 
@@ -1423,6 +1432,7 @@ const toTopEl = document.getElementById("toTop");
 const headerEl = document.getElementById("siteHeader");
 const heroEl = document.getElementById("hero");
 const compactInner = document.getElementById("compactInner");
+const detailLabelEl = document.getElementById("detailLabel");
 let activeId = null;
 let spy = null;
 
@@ -1466,6 +1476,7 @@ function render() {
     });
     card.addEventListener("click", () => {
       setActive(cat.id);
+      showOnly(cat.id);
       const section = document.getElementById("sec-" + cat.id);
       if (section) section.scrollIntoView({ behavior: "smooth", block: "center" });
     });
@@ -1530,6 +1541,7 @@ function render() {
         sectionsEl.prepend(section);
       }
       setActive(cat.id);
+      showOnly(cat.id);
       section.style.scrollMarginTop = (headerEl.offsetHeight + 12) + "px";
       section.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -1548,7 +1560,18 @@ function render() {
   }
 
   setActive(activeId);
+  showOnly(activeId);
   updateNav();
+}
+
+/* Show only the selected section; hide all detail content when nothing is selected */
+function showOnly(id) {
+  const sel = id ? "sec-" + id : null;
+  sectionsEl.querySelectorAll(".section").forEach(s => {
+    s.classList.toggle("visible", sel !== null && s.id === sel);
+  });
+  if (detailLabelEl) detailLabelEl.style.display = id ? "" : "none";
+  sectionsEl.classList.toggle("has-selection", !!id);
 }
 
 function setActive(id) {
