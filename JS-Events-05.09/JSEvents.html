@@ -1523,9 +1523,15 @@ function render() {
     b.appendChild(ic);
     b.appendChild(nm);
     b.addEventListener("click", () => {
-      setActive(cat.id);
       const section = document.getElementById("sec-" + cat.id);
-      if (section) section.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (!section) return;
+      // bring the clicked section right below the sticky nav
+      if (sectionsEl.firstElementChild !== section) {
+        sectionsEl.prepend(section);
+      }
+      setActive(cat.id);
+      section.style.scrollMarginTop = (headerEl.offsetHeight + 12) + "px";
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     compactInner.appendChild(b);
   });
