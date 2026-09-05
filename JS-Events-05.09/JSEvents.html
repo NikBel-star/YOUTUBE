@@ -101,6 +101,17 @@
     font-weight: 700;
   }
 
+  /* Selected state: hero collapses, compact nav takes over */
+  body.has-selection .hero {
+    min-height: 0;
+    padding: 0 0 4px;
+  }
+
+  body.has-selection .hero .page-heading,
+  body.has-selection .hero .grid {
+    display: none;
+  }
+
   .langbar {
     display: inline-flex;
     gap: 6px;
@@ -1475,6 +1486,12 @@ function render() {
       hideTooltip();
     });
     card.addEventListener("click", () => {
+      if (activeId === cat.id) {
+        setActive(null);
+        showOnly(null);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       setActive(cat.id);
       showOnly(cat.id);
       const section = document.getElementById("sec-" + cat.id);
@@ -1534,6 +1551,12 @@ function render() {
     b.appendChild(ic);
     b.appendChild(nm);
     b.addEventListener("click", () => {
+      if (activeId === cat.id) {
+        setActive(null);
+        showOnly(null);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       const section = document.getElementById("sec-" + cat.id);
       if (!section) return;
       // bring the clicked section right below the sticky nav
@@ -1572,10 +1595,12 @@ function showOnly(id) {
   });
   if (detailLabelEl) detailLabelEl.style.display = id ? "" : "none";
   sectionsEl.classList.toggle("has-selection", !!id);
+  document.body.classList.toggle("has-selection", !!id);
 }
 
 function setActive(id) {
   activeId = id;
+  updateNav();
   gridEl.querySelectorAll(".cat").forEach(c => {
     c.classList.toggle("active", c.dataset.id === id);
   });
@@ -1595,11 +1620,10 @@ function setActive(id) {
   }
 }
 
-/* Compact nav visibility — show once the hero grid is scrolled away */
+/* Compact nav visibility — shown only while a category is selected */
 function updateNav() {
-  if (!heroEl || !headerEl) return;
-  const r = heroEl.getBoundingClientRect();
-  headerEl.classList.toggle("nav-visible", r.bottom < 90);
+  if (!headerEl) return;
+  headerEl.classList.toggle("nav-visible", !!activeId);
 }
 
 function escapeHtml(s) {
@@ -1672,6 +1696,8 @@ toTopEl.addEventListener("click", () => {
 /* Brand button — back to the categories grid at the top */
 document.getElementById("brandBtn").addEventListener("click", () => {
   hideTooltip();
+  setActive(null);
+  showOnly(null);
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
