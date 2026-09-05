@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<title>Necessary Docker Commands</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0f1e;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, #1a2540, #0d1525);
+    border: 1px solid #2a2f3a;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    max-width: 960px;
+  }
+
+  .headline {
+    margin: 0 0 8px;
+    text-align: center;
+    color: #7fd6a8;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .section-title {
+    margin: 18px 0 10px;
+    color: #7fd6a8;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    text-align: center;
+  }
+
+  .section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hook {
+    padding: 28px 18px;
+    text-align: center;
+    color: #f2f2f2;
+    font-weight: 600;
+    font-size: 14px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    line-height: 1.3;
+  }
+
+  .hook:hover {
+    color: #7fd6a8;
+    background: rgba(127,214,168,0.1);
+    transform: scale(1.03);
+  }
+
+  .grid .hook:nth-child(3n) {
+    border-right: none;
+  }
+
+  .grid .hook:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+
+  .grid.grid-2 .hook:nth-child(2n) {
+    border-right: none;
+  }
+
+  .grid.grid-2 .hook:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+
+  .grid.hook-active .hook:not(:hover) {
+    opacity: 0.15;
+    filter: blur(2px);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .tooltip {
+    position: absolute;
+    padding: 10px 16px;
+    background: #1a1d24;
+    border: 1px solid #3a3f4a;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 360px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+  }
+
+  .tooltip .hook-name {
+    color: #7fd6a8;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .vs-badge {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 14px;
+    background: rgba(127,214,168,0.08);
+    border: 1px solid rgba(127,214,168,0.18);
+    border-radius: 20px;
+    color: #9ecfba;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .footer {
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  .custom {
+    color: #336ef0;
+    font-weight: 700;
+  }
+
+  .footer-note {
+    margin-top: 10px;
+    color: #b7c4ea;
+    font-size: 11px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1 class="headline">დოკერის ბრძანებები მაწილი 1</h1>
+
+  <br>
+  <!-- 1. შემოწმება და ინფორმაცია (3 კამანდა) -->
+  <div class="section-title">1. არსებული დოკერიზაციის შემოწმება და ინფორმაცია</div>
+  <div class="grid" id="verificationGrid"></div>
+
+  <!-- 2. მდგომარეობის შემოწმება (4 კამანდა) -->
+  <div class="section-title">2. არსებული მდგომარეობის შემოწმება</div>
+  <div class="grid" id="stateGrid"></div>
+
+  <!-- 3. სატესტო (5 კამანდა) -->
+  <div class="section-title">3. სატესტო</div>
+  <div class="grid" id="testingGrid"></div>
+
+  <!-- 4. მულტი კონტეინერების ორკესტრაცია (6 კამანდა) -->
+  <div class="section-title">4. მულტი კონტეინერების ორკესტრაცია/მართვა</div>
+  <div class="grid" id="composeGrid"></div>
+
+  <div class="footer">
+    <span class="vs-badge">⚡ Docker — აპლიკაციების კონტეინერიზაცია წამებში</span>
+    <p class="footer-note">🔵 ლურჯი ფერით მოცემული სახელები არის custom და შეცვალეთ თქვენი პროექტის სახელებით</p>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+  // 1. არსებული დოკერიზაციის შემოწმება და ინფორმაცია (3 კამანდა)
+  const verification = [
+    "docker --version",
+    "docker info",
+    "docker compose version"
+  ];
+
+  // 2. არსებული მდგომარეობის შემოწმება (4 კამანდა)
+  const state = [
+    "docker ps",
+    "docker images",
+    "docker volume ls",
+    "build"
+  ];
+
+  // 3. სატესტო (5 კამანდა)
+  const testing = [
+    "docker pull hello-world",
+    "docker run -d -p 80:80 hello-world",
+    "docker stop my-web",
+    "docker rm my-web",
+    "docker rmi hello-world"
+  ];
+
+  // 4. მულტი კონტეინერების ორკესტრაცია/მართვა (6 კამანდა)
+  const compose = [
+    "docker compose up -d",
+    "docker compose down",
+    "docker compose ps",
+    "docker compose logs",
+    "docker compose restart",
+    "docker compose build"
+  ];
+
+  const descriptions = {
+    // 1. არსებული დოკერიზაციის შემოწმება და ინფორმაცია
+    "docker --version": "Docker-ის ვერსიის შემოწმება. აჩვენებს ზუსტ ნომერს (მაგ: 24.0.7). სასარგებლოა პრობლემების მოსაგვარებლად.",
+    "docker info": "სისტემური ინფორმაცია: OS, Kernel, Storage Driver, Memory, CPU. გვიჩვენებს დისკის მოხმარებასა და კონტეინერების რაოდენობას.",
+    "docker compose version": "ამოწმებს დაინსტალირებულია თუ არა Compose პლაგინი. Docker-ის ძველ ვერსიებში ცალკე ინსტალდებოდა.",
+
+    // 2. არსებული მდგომარეობის შემოწმება
+    "docker ps": "მიმდინარე Container-ების სია: ID, Image, Status, Ports. -a ფლაგით ნახავთ გაჩერებულებსაც.",
+    "docker images": "ყველა ჩამოტვირთული Image-ის სია: სახელი, Tag, ID, ზომა და შექმნის თარიღი.",
+    "docker volume ls": "სისტემაში არსებული ყველა Volume-ის სიის ნახვა. სასარგებლოა დისკის მართვისთვის.",
+    "build": "Image-ის აგება Dockerfile-დან. -t ფლაგით სახელი მიანიჭეთ.",
+
+    // 3. სატესტო
+    "docker pull hello-world": "Image-ის ჩამოტვირთვა Docker Hub-დან თქვენს ლოკალურ მანქანაზე. Hello World ყველაზე მარტივი Image-ია ტესტირებისთვის.",
+    "docker run -d -p 80:80 hello-world": "Container-ის გაშვება detached რეჟიმში, პორტ 80-ის მიბმით. Hello World მარტივად ამოწმებს გაშვებას.",
+    "docker stop my-web": "აგზავნის SIGTERM სიგნალს, 10 წამი ელოდება, მერე SIGKILL-ს. ნაზად აჩერებს პროცესებს.",
+    "docker rm my-web": "შლის Container-ის metadata-ს და writable layer-ს. -f ფლაგით ძალით შლის მიმდინარესაც.",
+    "docker rmi hello-world": "შლის Image-ს და ათავისუფლებს დისკის სივრცეს. ჯერ უნდა გააჩეროთ ყველა Container-ი ამ Image-ით.",
+
+    // 4. მულტი კონტეინერების ორკესტრაცია/მართვა
+    "docker compose up -d": "ყველა სერვისის გაშვება ფონურ რეჟიმში. ქმნის ქსელებს, იმიჯებს და Container-ებს docker-compose.yml-დან.",
+    "docker compose down": "აჩერებს და შლის ყველა Container-სა და ქსელს. Volumes არ იშლება -v ფლაგის გარეშე.",
+    "docker compose ps": "აჩვენებს compose-ით მართულ მიმდინარე სერვისებს: სახელს, სტატუსს, პორტებს.",
+    "docker compose logs": "ყველა სერვისის logs-ის ნახვა. -f ფლაგით real-time რეჟიმში აჩვენებს.",
+    "docker compose restart": "ყველა სერვისის ხელახლა გაშვება. ცვლილებების გარეშე გადატვირთვა.",
+    "docker compose build": "სერვისების Image-ების ხელახლა აგება Dockerfile-დან. ქეშირებული ფეერების გამოყენება."
+  };
+
+  const verificationGrid = document.getElementById("verificationGrid");
+  const stateGrid = document.getElementById("stateGrid");
+  const testingGrid = document.getElementById("testingGrid");
+  const composeGrid = document.getElementById("composeGrid");
+  const tooltip = document.getElementById("tooltip");
+  const card = document.getElementById("card");
+
+  function createHook(name, grid) {
+    const div = document.createElement("div");
+    div.className = "hook";
+    div.innerHTML = name.replace(/my-web|my-app|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
+
+    div.addEventListener("mouseenter", () => {
+      document.querySelectorAll(".grid").forEach(g => g.classList.add("hook-active"));
+      tooltip.innerHTML = `<span class="hook-name">${name}</span>${descriptions[name] || ""}`;
+      tooltip.classList.add("visible");
+      positionTooltip(div);
+    });
+
+    div.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".grid").forEach(g => g.classList.remove("hook-active"));
+      tooltip.classList.remove("visible");
+    });
+
+    div.addEventListener("click", () => {
+      navigator.clipboard.writeText(name);
+      div.style.color = "#7fd6a8";
+      setTimeout(() => div.style.color = "#f2f2f2", 500);
+    });
+
+    grid.appendChild(div);
+  }
+
+  verification.forEach(name => createHook(name, verificationGrid));
+  state.forEach(name => createHook(name, stateGrid));
+  testing.forEach(name => createHook(name, testingGrid));
+  compose.forEach(name => createHook(name, composeGrid));
+
+  function positionTooltip(hookEl) {
+    const hookRect = hookEl.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const gap = 12;
+
+    let left = hookRect.left - cardRect.left + (hookRect.width / 2);
+    let top = hookRect.top - cardRect.top - gap;
+
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const tipRect = tooltip.getBoundingClientRect();
+
+    left = left - (tipRect.width / 2);
+
+    if (left < 0) left = 0;
+    if (left + tipRect.width > cardRect.width) {
+      left = cardRect.width - tipRect.width;
+    }
+
+    top = top - tipRect.height;
+    if (top < 0) {
+      top = hookRect.top - cardRect.top + hookRect.height + gap;
+    }
+
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+    tooltip.style.visibility = "visible";
+  }
+</script>
+
+</body>
+</html>

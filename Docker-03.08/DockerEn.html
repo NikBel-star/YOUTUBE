@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Necessary Docker Commands</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0f1e;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, #1a2540, #0d1525);
+    border: 1px solid #2a2f3a;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    max-width: 960px;
+  }
+
+  .headline {
+    margin: 0 0 8px;
+    text-align: center;
+    color: #7fd6a8;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .section-title {
+    margin: 18px 0 10px;
+    color: #7fd6a8;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    text-align: center;
+  }
+
+  .section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hook {
+    padding: 28px 18px;
+    text-align: center;
+    color: #f2f2f2;
+    font-weight: 600;
+    font-size: 14px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    line-height: 1.3;
+  }
+
+  .hook:hover {
+    color: #7fd6a8;
+    background: rgba(127,214,168,0.1);
+    transform: scale(1.03);
+  }
+
+  .grid .hook:nth-child(3n) {
+    border-right: none;
+  }
+
+  .grid .hook:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+
+  .grid.grid-2 .hook:nth-child(2n) {
+    border-right: none;
+  }
+
+  .grid.grid-2 .hook:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+
+  .grid.hook-active .hook:not(:hover) {
+    opacity: 0.15;
+    filter: blur(2px);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .tooltip {
+    position: absolute;
+    padding: 10px 16px;
+    background: #1a1d24;
+    border: 1px solid #3a3f4a;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 360px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+  }
+
+  .tooltip .hook-name {
+    color: #7fd6a8;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .vs-badge {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 14px;
+    background: rgba(127,214,168,0.08);
+    border: 1px solid rgba(127,214,168,0.18);
+    border-radius: 20px;
+    color: #9ecfba;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .footer {
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  .custom {
+    color: #336ef0;
+    font-weight: 700;
+  }
+
+  .footer-note {
+    margin-top: 10px;
+    color: #b7c4ea;
+    font-size: 11px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1 class="headline">Docker commands part 1</h1>
+
+  <!-- 1. Verification & Info (3 commands) -->
+  <div class="section-title">1. Existing Dockerization Verification & Info</div>
+  <div class="grid" id="verificationGrid"></div>
+
+  <!-- 2. State Check (4 commands) -->
+  <div class="section-title">2. Existing State Check</div>
+  <div class="grid" id="stateGrid"></div>
+
+  <!-- 3. Testing (5 commands) -->
+  <div class="section-title">3. Testing</div>
+  <div class="grid" id="testingGrid"></div>
+
+  <!-- 4. Multi-container Orchestration (6 commands) -->
+  <div class="section-title">4. Multi-container Orchestration/Management</div>
+  <div class="grid" id="composeGrid"></div>
+
+  <div class="footer">
+    <span class="vs-badge">⚡ Docker — containerize your apps in seconds</span>
+    <p class="footer-note">🔵 Blue colored names are custom — replace them with your project names</p>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+  // 1. Existing Dockerization Verification & Info (3 commands)
+  const verification = [
+    "docker --version",
+    "docker info",
+    "docker compose version"
+  ];
+
+  // 2. Existing State Check (4 commands)
+  const state = [
+    "docker ps",
+    "docker images",
+    "docker volume ls",
+    "build"
+  ];
+
+  // 3. Testing (5 commands)
+  const testing = [
+    "docker pull hello-world",
+    "docker run -d -p 80:80 hello-world",
+    "docker stop my-web",
+    "docker rm my-web",
+    "docker rmi hello-world"
+  ];
+
+  // 4. Multi-container Orchestration/Management (6 commands)
+  const compose = [
+    "docker compose up -d",
+    "docker compose down",
+    "docker compose ps",
+    "docker compose logs",
+    "docker compose restart",
+    "docker compose build"
+  ];
+
+  const descriptions = {
+    // 1. Existing Dockerization Verification & Info
+    "docker --version": "Check Docker version. Shows exact number (e.g. 24.0.7). Useful for troubleshooting compatibility issues.",
+    "docker info": "System info: OS, Kernel, Storage Driver, Memory, CPU. Shows disk usage, running containers, and server status.",
+    "docker compose version": "Check if Compose plugin is installed. In older Docker versions, Compose was installed separately as docker-compose.",
+
+    // 2. Existing State Check
+    "docker ps": "List running containers: ID, image, status, ports. Use -a flag to also see stopped containers.",
+    "docker images": "List all downloaded images: name, tag, ID, size, and creation date. Helps manage disk space.",
+    "docker volume ls": "List all volumes in the system. Useful for managing disk space.",
+    "build": "Build an image from Dockerfile. Use -t flag to assign a name.",
+
+    // 3. Testing
+    "docker pull hello-world": "Download an image from Docker Hub to your local machine. Hello World is the simplest image for testing.",
+    "docker run -d -p 80:80 hello-world": "Run a container in detached mode, mapping port 80. Hello World easily verifies Docker is working.",
+    "docker stop my-web": "Sends SIGTERM signal, waits 10 seconds, then SIGKILL. Gracefully stops processes inside the container.",
+    "docker rm my-web": "Remove container metadata and writable layer. Use -f flag to force remove a running container.",
+    "docker rmi hello-world": "Remove an image and free disk space. First stop all containers using this image, or use -f to force remove.",
+
+    // 4. Multi-container Orchestration/Management
+    "docker compose up -d": "Start all services in background mode. Creates networks, builds images, and starts containers from docker-compose.yml.",
+    "docker compose down": "Stop and remove all containers and networks. Volumes are NOT removed unless you use -v flag.",
+    "docker compose ps": "Show running services managed by compose: service name, status, and exposed ports.",
+    "docker compose logs": "View logs from all services. Use -f flag for real-time streaming.",
+    "docker compose restart": "Restart all services without rebuilding. Quick way to apply config changes.",
+    "docker compose build": "Rebuild service images from Dockerfile. Uses cached layers when possible."
+  };
+
+  const verificationGrid = document.getElementById("verificationGrid");
+  const stateGrid = document.getElementById("stateGrid");
+  const testingGrid = document.getElementById("testingGrid");
+  const composeGrid = document.getElementById("composeGrid");
+  const tooltip = document.getElementById("tooltip");
+  const card = document.getElementById("card");
+
+  function createHook(name, grid) {
+    const div = document.createElement("div");
+    div.className = "hook";
+    div.innerHTML = name.replace(/my-web|my-app|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
+
+    div.addEventListener("mouseenter", () => {
+      document.querySelectorAll(".grid").forEach(g => g.classList.add("hook-active"));
+      tooltip.innerHTML = `<span class="hook-name">${name}</span>${descriptions[name] || ""}`;
+      tooltip.classList.add("visible");
+      positionTooltip(div);
+    });
+
+    div.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".grid").forEach(g => g.classList.remove("hook-active"));
+      tooltip.classList.remove("visible");
+    });
+
+    div.addEventListener("click", () => {
+      navigator.clipboard.writeText(name);
+      div.style.color = "#7fd6a8";
+      setTimeout(() => div.style.color = "#f2f2f2", 500);
+    });
+
+    grid.appendChild(div);
+  }
+
+  verification.forEach(name => createHook(name, verificationGrid));
+  state.forEach(name => createHook(name, stateGrid));
+  testing.forEach(name => createHook(name, testingGrid));
+  compose.forEach(name => createHook(name, composeGrid));
+
+  function positionTooltip(hookEl) {
+    const hookRect = hookEl.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const gap = 12;
+
+    let left = hookRect.left - cardRect.left + (hookRect.width / 2);
+    let top = hookRect.top - cardRect.top - gap;
+
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const tipRect = tooltip.getBoundingClientRect();
+
+    left = left - (tipRect.width / 2);
+
+    if (left < 0) left = 0;
+    if (left + tipRect.width > cardRect.width) {
+      left = cardRect.width - tipRect.width;
+    }
+
+    top = top - tipRect.height;
+    if (top < 0) {
+      top = hookRect.top - cardRect.top + hookRect.height + gap;
+    }
+
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+    tooltip.style.visibility = "visible";
+  }
+</script>
+
+</body>
+</html>

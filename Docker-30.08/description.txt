@@ -1,0 +1,39 @@
+📦 Docker — ძირითადი კონცეფციები და გამოყენების სფეროები
+
+ისწავლე Docker-ის 6 ძირითადი კონცეფცია:
+• Docker Engine — პლატფორმის ბირთვი (Daemon, REST API, CLI)
+• Image — მხოლოდ წასაკითხი შაბლონი კოდით, გარემოთი და ბიბლიოთეკებით
+• Container — Image-ის გაშვებული იზოლირებული ეგზემპლარი
+• Docker Registry — ცენტრალიზებული საცავი (Docker Hub, AWS ECR)
+• Volume — მონაცემების მუდმივი შენახვა
+• Network — იზოლირებული ქსელი კონტეინერებსა და Host-ს შორის
+
+გამოყენების სფეროები:
+• გარემოს სტანდარტიზაცია — "It works on my machine" პრობლემის აღმოფხვრა
+• Microservices — იზოლირებული მიკროსერვისები
+• CI/CD პაიპლაინები — ავტომატიზირებული ტესტირება და Build
+• Deployment & Onboarding — წამებში მზად
+
+⚡ განსხვავება VM-ებისგან — მუშაობს Host Kernel-ზე, Hypervisor არ არის საჭირო
+
+---
+
+📦 Docker — Core Concepts & Use Cases
+
+Learn Docker's 6 core concepts:
+• Docker Engine — platform core (Daemon, REST API, CLI)
+• Image — read-only template with code, env variables, libraries
+• Container — isolated running instance of an Image
+• Docker Registry — centralized storage (Docker Hub, AWS ECR)
+• Volume — persistent data storage
+• Network — isolated communication between containers and Host
+
+Use Cases:
+• Environment Standardization — eliminate "It works on my machine"
+• Microservices — package, run, scale in isolation
+• CI/CD Pipelines — automated testing and builds
+• Deployment & Onboarding — ready in seconds
+
+⚡ Unlike VMs — runs on Host Kernel, no Hypervisor needed
+
+#docker #tutorial #devops #containers #linux #programming #webdevelopment #georgian

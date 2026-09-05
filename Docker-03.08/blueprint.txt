@@ -1,0 +1,19 @@
+Docker-30.08/ სტრუქტურა (საცნობარო):
+ფაილი
+README.md
+description.txt
+DockerEn.html
+DockerKa.html
+.git/
+გეგმა: Docker-03.08 შექმნა
+ნაბიჯი 1: README.md
+- იგივე სტილის ქართული აღწერა
+- სტრუქტურის განმარტება
+- შენიშვნა HTML ფაილების შესახებ
+ნაბიჯი 2: description.txt
+- YouTube ვიდეოს აღწერა (KA + EN)
+- ჰეშტაგები
+- შენ მომაწვდი შინაარსს
+ნაბიჯი 3: HTML ფაილები (მოგვიანებით)
+- DockerEn.html / DockerKa.html
+- იგივე card/grid დიზაინი

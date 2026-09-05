@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<title>React Hooks</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0f14;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, #1f2430, #0f1219);
+    border: 1px solid #2a2f3a;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+
+  .headline {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #7fd6a8;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hook {
+    padding: 32px 24px;
+    text-align: center;
+    color: #f2f2f2;
+    font-weight: 600;
+    font-size: 15px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .hook:hover {
+    color: #7fd6a8;
+    background: rgba(127,214,168,0.1);
+    transform: scale(1.03);
+  }
+
+  .grid .hook:nth-child(4n) {
+    border-right: none;
+  }
+
+  .grid .hook:nth-last-child(-n+4) {
+    border-bottom: none;
+  }
+
+  .grid.hook-active .hook:not(:hover) {
+    opacity: 0.15;
+    filter: blur(2px);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .tooltip {
+    position: absolute;
+    padding: 10px 16px;
+    background: #1a1d24;
+    border: 1px solid #3a3f4a;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 340px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+  }
+
+  .tooltip .hook-name {
+    color: #7fd6a8;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1 class="headline">20 React Builtin Hooks</h1>
+  <div class="grid" id="hookGrid"></div>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+  const hooks = [
+    "useState", "useReducer", "useContext", "useRef",
+    "useImperativeHandle", "useEffect", "useLayoutEffect", "useInsertionEffect",
+    "useMemo", "useCallback", "useTransition", "useDeferredValue",
+    "useId", "useDebugValue", "useSyncExternalStore", "useActionState",
+    "useOptimistic", "useEffectEvent", "useFormStatus", "useAPI"
+  ];
+
+  const hookDescriptions = {
+    "useState": "Stores and updates a component's state. → Used for simple state.",
+    "useReducer": "Manages complex state logic via a reducer. → Used for complex state changes.",
+    "useContext": "Reads data from Context. → Used to avoid props drilling.",
+    "useRef": "Stores a value without causing re-renders. → Used for DOM references and mutable values.",
+    "useImperativeHandle": "Defines what a child exposes to its parent via ref. → Used to control the ref API.",
+    "useEffect": "Runs side effects after render. → Used for API calls, timers, subscriptions, etc.",
+    "useLayoutEffect": "Runs effects after DOM updates, before paint. → Used for measuring the DOM and synchronous changes.",
+    "useInsertionEffect": "Runs before styles are inserted into the DOM. → Used mainly in CSS-in-JS libraries.",
+    "useMemo": "Memoizes the result of a calculation. → Used to optimize expensive computations.",
+    "useCallback": "Memoizes a function reference. → Used to reduce unnecessary re-renders.",
+    "useTransition": "Marks a state update as low priority. → Used to keep the UI responsive.",
+    "useDeferredValue": "Makes a value's update lower priority. → Used to defer heavy UI updates.",
+    "useId": "Generates a stable unique ID. → Used for SSR and accessibility.",
+    "useDebugValue": "Adds debug information for custom hooks. → Used to display a hook's value in React DevTools.",
+    "useSyncExternalStore": "Connects React to an external store. → Used for external state systems like Redux.",
+    "useActionState": "Manages an action's state, error, and pending status. → Used with Form Actions.",
+    "useOptimistic": "Shows changes immediately, before the server responds. → Used for optimistic UI.",
+    "useEffectEvent": "Creates an event handler that works inside an effect without dependencies. → Used to access the latest props inside an effect without re-triggering it.",
+    "useFormStatus": "Reads the submission status of the parent <form>. → Used to get pending, data, method, and action information.",
+    "useAPI": "Reads a promise or context during a component's render. → Used to read async data or access context."
+  };
+
+  const grid = document.getElementById("hookGrid");
+  const tooltip = document.getElementById("tooltip");
+  const card = document.getElementById("card");
+
+  hooks.forEach(name => {
+    const div = document.createElement("div");
+    div.className = "hook";
+    div.textContent = name;
+
+    div.addEventListener("mouseenter", e => {
+      grid.classList.add("hook-active");
+      tooltip.innerHTML = `<span class="hook-name">${name}</span>${hookDescriptions[name] || ""}`;
+      tooltip.classList.add("visible");
+      positionTooltip(div);
+    });
+
+    div.addEventListener("mouseleave", () => {
+      grid.classList.remove("hook-active");
+      tooltip.classList.remove("visible");
+    });
+
+    div.addEventListener("click", () => {
+      navigator.clipboard.writeText(name);
+      div.style.color = "#7fd6a8";
+      setTimeout(() => div.style.color = "#f2f2f2", 500);
+    });
+
+    grid.appendChild(div);
+  });
+
+  function positionTooltip(hookEl) {
+    const hookRect = hookEl.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const gap = 12;
+
+    // Show above the hook, centered
+    let left = hookRect.left - cardRect.left + (hookRect.width / 2);
+    let top = hookRect.top - cardRect.top - gap;
+
+    // Set tooltip content first so we can measure it
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const tipRect = tooltip.getBoundingClientRect();
+
+    // Center horizontally
+    left = left - (tipRect.width / 2);
+
+    // Clamp within card
+    if (left < 0) left = 0;
+    if (left + tipRect.width > cardRect.width) {
+      left = cardRect.width - tipRect.width;
+    }
+
+    // If not enough space above, show below
+    top = top - tipRect.height;
+    if (top < 0) {
+      top = hookRect.top - cardRect.top + hookRect.height + gap;
+    }
+
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+    tooltip.style.visibility = "visible";
+  }
+</script>
+
+</body>
+</html>

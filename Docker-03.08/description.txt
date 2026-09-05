@@ -1,0 +1,67 @@
+🐳 Necessary Docker Commands after first run
+
+Docker-ის პირველი გაშვების შემდეგ საჭირო ძირითადი ბრძანებები:
+
+📦 1. არსებული დოკერიზაციის შემოწმება და ინფორმაცია (3 კამანდა)
+• docker --version — Docker-ის ვერსია
+• docker info — სისტემის ინფორმაცია
+• docker compose version — Compose-ის ვერსია
+
+📊 2. არსებული მდგომარეობის შემოწმება (4 კამანდა)
+• docker ps — Container-ების შემოწმება
+• docker images — Image-ების შემოწმება
+• docker volume ls — Volume-ების შემოწმება
+• build — Build-ის შემოწმება
+
+🧪 3. სატესტო (5 კამანდა)
+• docker pull — Image-ის ჩამოტვირთვა
+• docker run — Container-ის გაშვება
+• docker stop — Container-ის გაჩერება
+• docker rm — Container-ის წაშლა
+• docker rmi — Image-ის წაშლა
+
+🔄 4. მულტი კონტეინერების ორკესტრაცია/მართვა (6 კამანდა)
+• docker compose up — სერვისების გაშვება
+• docker compose down — სერვისების გაჩერება
+• docker compose ps — სერვისების სია
+• docker compose logs — სერვისების logs
+• docker compose restart — სერვისების ხელახლა გაშვება
+• docker compose build — სერვისების აგება
+
+⚡ პრაქტიკული მაგალითები რეალური პროექტებიდან
+
+---
+
+🐳 Necessary Docker Commands after first run
+
+Essential Docker commands after first run:
+
+📦 1. Existing Dockerization Verification & Info (3 commands)
+• docker --version — check Docker version
+• docker info — system information
+• docker compose version — Compose version
+
+📊 2. Existing State Check (4 commands)
+• docker ps — check containers
+• docker images — check images
+• docker volume ls — check volumes
+• build — check build
+
+🧪 3. Testing (5 commands)
+• docker pull — download an image
+• docker run — run a container
+• docker stop — stop a container
+• docker rm — remove a container
+• docker rmi — remove an image
+
+🔄 4. Multi-container Orchestration/Management (6 commands)
+• docker compose up — start services
+• docker compose down — stop services
+• docker compose ps — list services
+• docker compose logs — view logs
+• docker compose restart — restart services
+• docker compose build — build services
+
+⚡ Practical examples from real projects
+
+#docker #tutorial #devops #containers #linux #commands #webdevelopment #georgian

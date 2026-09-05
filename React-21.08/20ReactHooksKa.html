@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<title>React Hooks</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0f14;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, #1f2430, #0f1219);
+    border: 1px solid #2a2f3a;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+
+  .headline {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #7fd6a8;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hook {
+    padding: 32px 24px;
+    text-align: center;
+    color: #f2f2f2;
+    font-weight: 600;
+    font-size: 15px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .hook:hover {
+    color: #7fd6a8;
+    background: rgba(127,214,168,0.1);
+    transform: scale(1.03);
+  }
+
+  .grid .hook:nth-child(4n) {
+    border-right: none;
+  }
+
+  .grid .hook:nth-last-child(-n+4) {
+    border-bottom: none;
+  }
+
+  .grid.hook-active .hook:not(:hover) {
+    opacity: 0.15;
+    filter: blur(2px);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .tooltip {
+    position: absolute;
+    padding: 10px 16px;
+    background: #1a1d24;
+    border: 1px solid #3a3f4a;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 340px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+  }
+
+  .tooltip .hook-name {
+    color: #7fd6a8;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1 class="headline">20 React Builtin Hooks</h1>
+  <div class="grid" id="hookGrid"></div>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+  const hooks = [
+    "useState", "useReducer", "useContext", "useRef",
+    "useImperativeHandle", "useEffect", "useLayoutEffect", "useInsertionEffect",
+    "useMemo", "useCallback", "useTransition", "useDeferredValue",
+    "useId", "useDebugValue", "useSyncExternalStore", "useActionState",
+    "useOptimistic", "useEffectEvent", "useFormStatus", "useAPI"
+  ];
+
+  const hookDescriptions = {
+    "useState": "ინახავს და აახლებს component-ის state-ს. → გამოიყენება მარტივი state-ისთვის.",
+    "useReducer": "მართავს რთულ state logic-ს reducer-ის საშუალებით. → გამოიყენება რთული state ცვლილებებისთვის.",
+    "useContext": "კითხულობს მონაცემს Context-იდან. → გამოიყენება props drilling-ის თავიდან ასაცილებლად.",
+    "useRef": "ინახავს მნიშვნელობას re-render-ის გარეშე. → გამოიყენება DOM reference-ისა და mutable value-სთვის.",
+    "useImperativeHandle": "განსაზღვრავს, რას გადასცემს child ref-ის საშუალებით parent-ს. → გამოიყენება ref API-ის კონტროლისთვის.",
+    "useEffect": "ასრულებს side effect-ს render-ის შემდეგ. → გამოიყენება API calls, timers, subscriptions და ა.შ.",
+    "useLayoutEffect": "ასრულებს effect-ს DOM update-ის შემდეგ, paint-მდე. → გამოიყენება DOM-ის გაზომვისა და სინქრონული ცვლილებისთვის.",
+    "useInsertionEffect": "DOM-ში style-ის ჩასმამდე მუშაობს. → ძირითადად გამოიყენება CSS-in-JS libraries-ში.",
+    "useMemo": "იმახსოვრებს calculation-ის შედეგს. → გამოიყენება ძვირადღირებული გამოთვლების ოპტიმიზაციისთვის.",
+    "useCallback": "იმახსოვრებს function-ის reference-ს. → გამოიყენება unnecessary re-render-ების შესამცირებლად.",
+    "useTransition": "state update-ს დაბალ პრიორიტეტად აღნიშნავს. → გამოიყენება UI-ის responsive შესანარჩუნებლად.",
+    "useDeferredValue": "value-ის განახლებას ნაკლებად პრიორიტეტულს ხდის. → გამოიყენება მძიმე UI-ის განახლების გადასავადებლად.",
+    "useId": "ქმნის სტაბილურ უნიკალურ ID-ს. → გამოიყენება SSR და Accessibility-ისთვის.",
+    "useDebugValue": "ამატებს debug information-ს custom hook-ებისთვის. → გამოიყენება React DevTools-ში hook-ის მნიშვნელობის საჩვენებლად.",
+    "useSyncExternalStore": "React-ს external store-თან აერთებს. → გამოიყენება Redux-ის მსგავსი external state სისტემებისთვის.",
+    "useActionState": "მართავს Action-ის state, error და pending მდგომარეობას. → გამოიყენება Form Actions-თან.",
+    "useOptimistic": "აჩვენებს ცვლილებას დაუყოვნებლივ, server-ის პასუხამდე. → გამოიყენება Optimistic UI-ისთვის.",
+    "useEffectEvent": "ქმნის event handler-ს, რომელიც effect-ში dependency-ების გარეშე მუშაობს. → გამოიყენება latest props-ების წვდომისთვის effect-ში re-trigger-ის გარეშე.",
+    "useFormStatus": "კითხულობს parent <form>-ის submission მდგომარეობას. → გამოიყენება pending, data, method, action ინფორმაციის მისაღებად.",
+    "useAPI": "კითხულობს promise-ს ან context-ს component-ის render-ის დროს. → გამოიყენება async data-ის წასაკითხად ან context-ის მისაღებად."
+  };
+
+  const grid = document.getElementById("hookGrid");
+  const tooltip = document.getElementById("tooltip");
+  const card = document.getElementById("card");
+
+  hooks.forEach(name => {
+    const div = document.createElement("div");
+    div.className = "hook";
+    div.textContent = name;
+
+    div.addEventListener("mouseenter", e => {
+      grid.classList.add("hook-active");
+      tooltip.innerHTML = `<span class="hook-name">${name}</span>${hookDescriptions[name] || ""}`;
+      tooltip.classList.add("visible");
+      positionTooltip(div);
+    });
+
+    div.addEventListener("mouseleave", () => {
+      grid.classList.remove("hook-active");
+      tooltip.classList.remove("visible");
+    });
+
+    div.addEventListener("click", () => {
+      navigator.clipboard.writeText(name);
+      div.style.color = "#7fd6a8";
+      setTimeout(() => div.style.color = "#f2f2f2", 500);
+    });
+
+    grid.appendChild(div);
+  });
+
+  function positionTooltip(hookEl) {
+    const hookRect = hookEl.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const gap = 12;
+
+    // Show above the hook, centered
+    let left = hookRect.left - cardRect.left + (hookRect.width / 2);
+    let top = hookRect.top - cardRect.top - gap;
+
+    // Set tooltip content first so we can measure it
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const tipRect = tooltip.getBoundingClientRect();
+
+    // Center horizontally
+    left = left - (tipRect.width / 2);
+
+    // Clamp within card
+    if (left < 0) left = 0;
+    if (left + tipRect.width > cardRect.width) {
+      left = cardRect.width - tipRect.width;
+    }
+
+    // If not enough space above, show below
+    top = top - tipRect.height;
+    if (top < 0) {
+      top = hookRect.top - cardRect.top + hookRect.height + gap;
+    }
+
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+    tooltip.style.visibility = "visible";
+  }
+</script>
+
+</body>
+</html>
