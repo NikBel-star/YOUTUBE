@@ -1,0 +1,4180 @@
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Events — Reference Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace;
+      --bg-body: #090a0f;
+      --bg-header: rgba(9, 10, 15, 0.88);
+      --bg-surface: #0e121a;
+      --bg-surface-elevated: #141824;
+      --bg-surface-hover: #161c2b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.16);
+      --border-focus: rgba(56, 189, 248, 0.45);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.12);
+      --sidebar-width: 280px;
+      --header-height: 64px;
+      --max-content-width: 1440px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      background: var(--bg-header);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-inner {
+      max-width: var(--max-content-width);
+      margin: 0 auto;
+      height: 100%;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      font-family: inherit;
+      text-align: left;
+      transition: opacity 0.15s ease;
+    }
+
+    .brand-group:hover {
+      opacity: 0.9;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .brand-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Search Header Input */
+    .search-wrapper {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 38px 0 36px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .search-clear:hover {
+      color: var(--text-primary);
+    }
+
+    .search-wrapper.has-val .search-clear {
+      display: flex;
+    }
+
+    /* Header Right Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .lang-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lang-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 14px;
+    }
+
+    .social-icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+
+    .social-icon-btn svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+    }
+
+    .social-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    /* App Layout */
+    .app-container {
+      max-width: var(--max-content-width);
+      margin: 0 auto;
+      display: flex;
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Sidebar Navigation */
+    .app-sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      padding: 24px 16px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .app-sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .app-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 10px 10px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-item-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+    }
+
+    .nav-item-btn.active {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .nav-label-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cat-indicator {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--item-color, var(--accent));
+      flex-shrink: 0;
+    }
+
+    .nav-counter {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .nav-item-btn.active .nav-counter {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+
+    /* Main Content Area */
+    .app-main {
+      flex: 1;
+      min-width: 0;
+      padding: 32px 40px 80px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stats-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stats-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .stats-subtitle {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .stats-pills {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .stat-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 5px 12px;
+    }
+
+    /* Mobile Category Bar (horizontal scroller for small devices) */
+    .mobile-cat-rail {
+      display: none;
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 6px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .mobile-cat-rail::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .mobile-chip.active {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Category Block (Spec Section) */
+    .category-section {
+      margin-bottom: 48px;
+      scroll-margin-top: calc(var(--header-height) + 24px);
+    }
+
+    .category-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .category-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .category-count-badge {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--cat-color, var(--accent));
+      background: color-mix(in srgb, var(--cat-color, var(--accent)) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--cat-color, var(--accent)) 25%, transparent);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .category-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 820px;
+    }
+
+    /* Event Table / Spec Sheet */
+    .spec-table {
+      width: 100%;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .spec-table-header {
+      display: grid;
+      grid-template-columns: 240px 1fr 90px;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    /* Event Item Wrapper (Contains row and expandable drawer) */
+    .event-item {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.15s ease;
+    }
+
+    .event-item:last-child {
+      border-bottom: none;
+    }
+
+    .event-item.preview-open {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 240px 1fr 90px;
+      padding: 12px 18px;
+      align-items: center;
+      transition: background 0.12s ease;
+    }
+
+    .event-row:hover {
+      background: var(--bg-surface-hover);
+    }
+
+    .event-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .event-code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cat-color, var(--accent));
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 8px;
+      border-radius: 5px;
+      border: 1px solid var(--border-subtle);
+      letter-spacing: -0.01em;
+    }
+
+    .event-desc-cell {
+      font-size: 13.5px;
+      color: #d1d5db;
+      line-height: 1.5;
+      padding-right: 18px;
+    }
+
+    /* Icon-Only Action Buttons */
+    .event-actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .action-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 7px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+      position: relative;
+    }
+
+    .action-icon-btn svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .action-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .action-icon-btn.active,
+    .action-icon-btn.is-active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--accent);
+    }
+
+    .action-icon-btn.copied {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .badge-deprecated {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    /* Expandable Code Snippet Drawer */
+    .event-snippet-drawer {
+      display: none;
+      background: #090c13;
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px 20px 20px;
+      animation: drawerOpen 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes drawerOpen {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .event-item.preview-open .event-snippet-drawer {
+      display: block;
+    }
+
+    .snippet-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 12px;
+    }
+
+    .snippet-drawer-info {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .snippet-lang-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .snippet-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .snippet-drawer-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .snippet-pre {
+      background: #05060a;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #e2e8f0;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .snippet-pre code {
+      font-family: inherit;
+    }
+
+    /* Code Syntax Highlighting Classes */
+    .syn-kw {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .syn-fn {
+      color: #818cf8;
+    }
+
+    .syn-str {
+      color: #34d399;
+    }
+
+    .syn-com {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .syn-num {
+      color: #f59e0b;
+    }
+
+    .syn-bool {
+      color: #ec4899;
+    }
+
+    .syn-obj {
+      color: #f43f5e;
+    }
+
+    /* No Results Message */
+    .no-results-box {
+      text-align: center;
+      padding: 64px 20px;
+      border: 1px dashed var(--border-subtle);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .no-results-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .no-results-sub {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #141824;
+      border: 1px solid var(--border-hover);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast svg {
+      width: 16px;
+      height: 16px;
+      color: #34d399;
+    }
+
+    /* Floating To Top Button */
+    .to-top-btn {
+      position: fixed;
+      right: 24px;
+      bottom: 74px;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      z-index: 999;
+    }
+
+    .to-top-btn.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .to-top-btn:hover {
+      background: var(--bg-surface-hover);
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+
+    /* Highlight Matching Text */
+    mark.highlight {
+      background: rgba(56, 189, 248, 0.25);
+      color: #7dd3fc;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .app-sidebar {
+        display: none;
+      }
+
+      .mobile-cat-rail {
+        display: flex;
+      }
+
+      .app-main {
+        padding: 24px 20px 60px;
+      }
+
+      .spec-table-header {
+        grid-template-columns: 200px 1fr 90px;
+      }
+
+      .event-row {
+        grid-template-columns: 200px 1fr 90px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 0 16px;
+        gap: 12px;
+      }
+
+      .brand-title {
+        font-size: 15px;
+      }
+
+      .brand-badge {
+        display: none;
+      }
+
+      .search-wrapper {
+        max-width: none;
+      }
+
+      .social-group {
+        display: none;
+      }
+
+      .spec-table-header {
+        display: none;
+      }
+
+      .event-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px 16px;
+      }
+
+      .event-desc-cell {
+        padding-right: 0;
+      }
+
+      .event-actions-cell {
+        justify-content: flex-start;
+        margin-top: 4px;
+      }
+
+      .stats-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <button class="brand-group" id="brandBtn" type="button" title="JavaScript Events Reference">
+        <span class="brand-title">JavaScript Events</span>
+        <span class="brand-badge">Living Standard</span>
+      </button>
+
+      <div class="search-wrapper" id="searchWrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search events...">
+        <button class="search-clear" id="searchClear" type="button" title="Clear">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <div class="lang-toggle" id="langToggle">
+          <button type="button" class="lang-btn active" data-lang="ka">ქარ</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="ru">РУС</button>
+        </div>
+
+        <div class="social-group">
+          <a href="https://www.facebook.com/BelaBirtvellishvili?locale=ka_GE" target="_blank" rel="noopener"
+            class="social-icon-btn" title="Facebook" aria-label="Facebook">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/birtvelishvilibela/" target="_blank" rel="noopener" class="social-icon-btn"
+            title="Instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+          </a>
+          <a href="https://www.linkedin.com/in/bela-birtvelishvili-7b85a8394/" target="_blank" rel="noopener"
+            class="social-icon-btn" title="LinkedIn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+          </a>
+          <a href="https://www.tiktok.com/@belabirtvelishvili?lang=en-GB" target="_blank" rel="noopener"
+            class="social-icon-btn" title="TikTok" aria-label="TikTok">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/@BelNik-Tutor" target="_blank" rel="noopener" class="social-icon-btn"
+            title="YouTube" aria-label="YouTube">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    <!-- Desktop Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-section-title" id="sidebarSectionTitle">კატეგორიები</div>
+      <ul class="nav-list" id="navList">
+        <!-- Generated via JS -->
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="app-main">
+      <!-- Mobile Categories Horizontal Bar -->
+      <div class="mobile-cat-rail" id="mobileCatRail">
+        <!-- Generated via JS -->
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stats-info">
+          <h1 class="stats-title" id="pageHeading">JavaScript Events</h1>
+          <p class="stats-subtitle" id="pageSubHeading">სრული დოკუმენტაცია და სპეციფიკაცია</p>
+        </div>
+        <div class="stats-pills">
+          <span class="stat-pill" id="totalCountPill">118 ივენთი</span>
+          <span class="stat-pill" id="totalCatsPill">21 კატეგორია</span>
+        </div>
+      </div>
+
+      <!-- Sections List (Container) -->
+      <div id="contentSections">
+        <!-- Generated via JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMsg">დაკოპირდა!</span>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="to-top-btn" id="toTopBtn" type="button" title="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <script>
+    const DATA = {
+      "ka": {
+        "title": "JavaScript Events",
+        "tagline": "JavaScript Events — 21 კატეგორია",
+        "catLabel": "კატეგორიები",
+        "detailLabel": "დეტალური მიმოხილვა",
+        "countLabel": "ივენთი",
+        "items": [
+          {
+            "id": "mouse",
+            "color": "#7fd6a8",
+            "name": "Mouse Events",
+            "short": "მაუსის მოქმედებებთან დაკავშირებული ივენთები (დაჭერა, გადაადგილება, ჰოვერი).",
+            "events": [
+              "click",
+              "dblclick",
+              "mousedown",
+              "mouseup",
+              "mousemove",
+              "mouseenter",
+              "mouseleave",
+              "mouseover",
+              "mouseout",
+              "contextmenu",
+              "auxclick",
+              "wheel"
+            ],
+            "desc": [
+              [
+                "click",
+                "როცა ელემენტზე მაუსით აქტიურდება დაწკაპუნება (mousedown + mouseup ერთსა და იმავე ელემენტზე)."
+              ],
+              [
+                "dblclick",
+                "სწრაფად ორმაგი დაწკაპუნებისას (double-click) აქტიურდება."
+              ],
+              [
+                "mousedown",
+                "აქტიურდება მაუსის ღილაკის დაჭერის მომენტში (ჯერ არ ათავისუფლებს)."
+              ],
+              [
+                "mouseup",
+                "აქტიურდება მაუსის ღილაკის გათავისუფლების მომენტში."
+              ],
+              [
+                "mousemove",
+                "აქტიურდება მაუსის კურსორის ნებისმიერ გადაადგილებაზე ელემენტის ფარგლებში."
+              ],
+              [
+                "mouseenter",
+                "მაუსის ელემენტში შესვლისას აქტიურდება, არ ბუშტდება (doesn't bubble), მოქმედებს მხოლოდ ტარგეტ ელემენტზე."
+              ],
+              [
+                "mouseleave",
+                "მაუსის ელემენტიდან გასვლისას აქტიურდება, ასევე არ ბუშტდება."
+              ],
+              [
+                "mouseover",
+                "აქტიურდება მაუსის ელემენტზე ან მის შვილობილ ელემენტზე შესვლისას, ბუშტდება (bubbles)."
+              ],
+              [
+                "mouseout",
+                "აქტიურდება მაუსის ელემენტიდან ან მისი შვილობილიდან გასვლისას, ასევე ბუშტდება."
+              ],
+              [
+                "contextmenu",
+                "აქტიურდება მარჯვენა ღილაკზე დაწკაპუნებისას (right-click), კონტექსტური მენიუს გამოძახებამდე."
+              ],
+              [
+                "auxclick",
+                "აქტიურდება არა-პირველადი ღილაკით დაწკაპუნებისას (მაგ. middle-click), click-ისგან განსხვავებით."
+              ],
+              [
+                "wheel",
+                "აქტიურდება მაუსის ბორბლის (scroll wheel) ბრუნვისას."
+              ]
+            ]
+          },
+          {
+            "id": "keyboard",
+            "color": "#f5a97f",
+            "name": "Keyboard Events",
+            "short": "კლავიატურაზე ღილაკების დაჭერასთან დაკავშირებული ივენთები.",
+            "events": [
+              "keydown",
+              "keyup",
+              "keypress (deprecated)"
+            ],
+            "desc": [
+              [
+                "keydown",
+                "აქტიურდება კლავიშის დაჭერის მომენტში, გრძელდება რეპიტით თუ დაჭერილი ჩავარდება (holding)."
+              ],
+              [
+                "keyup",
+                "აქტიურდება კლავიშის გათავისუფლების მომენტში."
+              ],
+              [
+                "keypress (deprecated)",
+                "ადრე ფაიერდებოდა სიმბოლოს გენერაციისას (მხოლოდ character-key-ებზე), ამჟამად რეკომენდებულია keydown/input-ის გამოყენება."
+              ]
+            ]
+          },
+          {
+            "id": "form",
+            "color": "#8bd5ff",
+            "name": "Form Events",
+            "short": "ფორმებთან და input ველებთან დაკავშირებული ივენთები (გაგზავნა, მნიშვნელობის ცვლილება).",
+            "events": [
+              "submit",
+              "reset",
+              "change",
+              "input",
+              "invalid",
+              "select",
+              "formdata"
+            ],
+            "desc": [
+              [
+                "submit",
+                "აქტიურდება ფორმის გაგზავნის მომენტში (submit ღილაკზე დაჭერით ან Enter-ით)."
+              ],
+              [
+                "reset",
+                "აქტიურდება ფორმის საწყის მდგომარეობაში დაბრუნებისას (reset ღილაკზე დაჭერით)."
+              ],
+              [
+                "change",
+                "აქტიურდება, როდესაც input-ის მნიშვნელობა შეიცვალა და ელემენტმა ფოკუსი დაკარგა (commit-ის შემდეგ)."
+              ],
+              [
+                "input",
+                "აქტიურდება უშუალოდ მნიშვნელობის ცვლილებისას, რეალურ დროში (ყოველი keystroke-ის შემდეგ)."
+              ],
+              [
+                "invalid",
+                "აქტიურდება, როდესაც ველი ვერ გადის ვალიდაციას submit-ის დროს (მაგ. required ველი ცარიელია)."
+              ],
+              [
+                "select",
+                "აქტიურდება, როდესაც ტექსტი მონიშნულია input/textarea ელემენტში."
+              ],
+              [
+                "formdata",
+                "აქტიურდება ფორმის მონაცემების FormData ობიექტში აწყობისას (submit-ის დროს)."
+              ]
+            ]
+          },
+          {
+            "id": "focus",
+            "color": "#ffd28a",
+            "name": "Focus Events",
+            "short": "ელემენტზე ფოკუსის მიღება/დაკარგვასთან დაკავშირებული ივენთები.",
+            "events": [
+              "focus",
+              "blur",
+              "focusin",
+              "focusout"
+            ],
+            "desc": [
+              [
+                "focus",
+                "აქტიურდება ელემენტზე ფოკუსის მიღების მომენტში, არ ბუშტდება (doesn't bubble)."
+              ],
+              [
+                "blur",
+                "აქტიურდება ელემენტზე ფოკუსის დაკარგვის მომენტში, ასევე არ ბუშტდება."
+              ],
+              [
+                "focusin",
+                "იგივეა რაც focus, მაგრამ ბუშტდება (bubbles), შეიძლება parent ელემენტზეც დაიჭიროთ."
+              ],
+              [
+                "focusout",
+                "იგივეა რაც blur, მაგრამ ბუშტდება."
+              ]
+            ]
+          },
+          {
+            "id": "clipboard",
+            "color": "#c8a6ff",
+            "name": "Clipboard Events",
+            "short": "კოპირება/ამოჭრა/ჩასმის მოქმედებებთან დაკავშირებული ივენთები.",
+            "events": [
+              "copy",
+              "cut",
+              "paste"
+            ],
+            "desc": [
+              [
+                "copy",
+                "აქტიურდება, როდესაც მომხმარებელი მონიშნულ კონტენტს კოპირებს (Ctrl+C ან კონტექსტური მენიუთი)."
+              ],
+              [
+                "cut",
+                "აქტიურდება, როდესაც მომხმარებელი მონიშნულ კონტენტს ჭრის (Ctrl+X), რაც შლის მას წყაროდან."
+              ],
+              [
+                "paste",
+                "აქტიურდება, როდესაც clipboard-იდან კონტენტი ჩასმულია ელემენტში (Ctrl+V)."
+              ]
+            ]
+          },
+          {
+            "id": "dragdrop",
+            "color": "#7ee0d8",
+            "name": "Drag & Drop Events",
+            "short": "ელემენტების გადათრევასა და დაგდებასთან დაკავშირებული ივენთები.",
+            "events": [
+              "dragstart",
+              "drag",
+              "dragenter",
+              "dragover",
+              "dragleave",
+              "drop",
+              "dragend"
+            ],
+            "desc": [
+              [
+                "dragstart",
+                "აქტიურდება, როდესაც მომხმარებელი იწყებს ელემენტის გადათრევას (drag-ის დაწყების მომენტი)."
+              ],
+              [
+                "drag",
+                "აქტიურდება განმეორებით გადათრევის პროცესის განმავლობაში (მსგავსია mousemove-ის)."
+              ],
+              [
+                "dragenter",
+                "აქტიურდება, როდესაც გადათრეული ელემენტი შედის შესაძლო drop-target-ის არეალში."
+              ],
+              [
+                "dragover",
+                "აქტიურდება განმეორებით, სანამ გადათრეული ელემენტი drop-target-ის თავზეა (აუცილებელია preventDefault() drop-ის დასაშვებად)."
+              ],
+              [
+                "dragleave",
+                "აქტიურდება, როდესაც გადათრეული ელემენტი ტოვებს drop-target-ის არეალს."
+              ],
+              [
+                "drop",
+                "აქტიურდება, როდესაც გადათრეული ელემენტი დაეშვება target-ზე."
+              ],
+              [
+                "dragend",
+                "აქტიურდება drag ოპერაციის დასრულებისას (წარმატებულის ან წარუმატებელის მიუხედავად)."
+              ]
+            ]
+          },
+          {
+            "id": "touch",
+            "color": "#ff9ec4",
+            "name": "Touch Events",
+            "short": "სენსორულ ეკრანზე თითით შეხებასთან დაკავშირებული ივენთები.",
+            "events": [
+              "touchstart",
+              "touchmove",
+              "touchend",
+              "touchcancel"
+            ],
+            "desc": [
+              [
+                "touchstart",
+                "აქტიურდება, როდესაც თითი ეხება ეკრანს (ერთი ან რამდენიმე touch point)."
+              ],
+              [
+                "touchmove",
+                "აქტიურდება თითის ეკრანზე გადაადგილებისას, კონტაქტის შენარჩუნებით."
+              ],
+              [
+                "touchend",
+                "აქტიურდება, როდესაც თითი შორდება ეკრანს (touch-ის დასრულება)."
+              ],
+              [
+                "touchcancel",
+                "აქტიურდება, როდესაც touch პროცესი წყდება გარეშე ფაქტორით (მაგ. სისტემური alert-ის გამოჩენა, ან თითის ეკრანიდან სხვა ზონაში გასვლა)."
+              ]
+            ]
+          },
+          {
+            "id": "pointer",
+            "color": "#6fb5ff",
+            "name": "Pointer Events",
+            "short": "უნიფიცირებული ივენთები, რომლებიც აერთიანებს მაუსის, თითისა და pen ინფუთს.",
+            "events": [
+              "pointerdown",
+              "pointerup",
+              "pointermove",
+              "pointerover",
+              "pointerout",
+              "pointerenter",
+              "pointerleave",
+              "pointercancel",
+              "gotpointercapture",
+              "lostpointercapture"
+            ],
+            "desc": [
+              [
+                "pointerdown",
+                "აქტიურდება ნებისმიერი pointer-ის (მაუსი, თითი, pen) აქტივაციისას, კონტაქტის დაწყების მომენტში."
+              ],
+              [
+                "pointerup",
+                "აქტიურდება pointer-ის კონტაქტის დასრულებისას (ღილაკის გათავისუფლება ან თითის აწევა)."
+              ],
+              [
+                "pointermove",
+                "აქტიურდება pointer-ის გადაადგილებისას."
+              ],
+              [
+                "pointerover",
+                "აქტიურდება pointer-ის ელემენტზე ან მის შვილობილზე შესვლისას, ბუშტდება."
+              ],
+              [
+                "pointerout",
+                "აქტიურდება pointer-ის ელემენტიდან ან მისი შვილობილიდან გასვლისას, ბუშტდება."
+              ],
+              [
+                "pointerenter",
+                "pointer-ის ელემენტში შესვლისას, არ ბუშტდება (მსგავსია mouseenter-ის)."
+              ],
+              [
+                "pointerleave",
+                "pointer-ის ელემენტიდან გასვლისას, არ ბუშტდება (მსგავსია mouseleave-ის)."
+              ],
+              [
+                "pointercancel",
+                "აქტიურდება, როდესაც pointer-ის ინტერაქცია წყდება მოულოდნელად (მაგ. სისტემურმა ჟესტმა შეაწყვეტინა)."
+              ],
+              [
+                "gotpointercapture",
+                "აქტიურდება, როდესაც ელემენტმა მიიღო pointer capture (ყველა შემდგომი ივენთი მიემართება მას)."
+              ],
+              [
+                "lostpointercapture",
+                "აქტიურდება, როდესაც ელემენტმა დაკარგა pointer capture."
+              ]
+            ]
+          },
+          {
+            "id": "media",
+            "color": "#ffb45c",
+            "name": "Media Events (audio/video)",
+            "short": "ვიდეო/აუდიო ელემენტების state-ცვლილებებთან დაკავშირებული ივენთები.",
+            "events": [
+              "play",
+              "pause",
+              "ended",
+              "timeupdate",
+              "volumechange",
+              "seeking",
+              "seeked",
+              "waiting",
+              "canplay",
+              "canplaythrough",
+              "loadstart",
+              "loadeddata",
+              "loadedmetadata",
+              "stalled",
+              "suspend",
+              "ratechange",
+              "durationchange",
+              "emptied",
+              "progress"
+            ],
+            "desc": [
+              [
+                "play",
+                "აქტიურდება, როდესაც მედია დაწყებულია/გაგრძელებულია დაკვრაზე (paused-იდან playing-ში გადასვლა)."
+              ],
+              [
+                "pause",
+                "აქტიურდება მედიის დაპაუზების მომენტში."
+              ],
+              [
+                "ended",
+                "აქტიურდება, როდესაც მედია დასრულდა (მთლიანად დაიკრა ბოლომდე)."
+              ],
+              [
+                "timeupdate",
+                "აქტიურდება მედიის დაკვრის დროის (currentTime) განახლებისას, ხშირად."
+              ],
+              [
+                "volumechange",
+                "აქტიურდება ხმის დონის ან mute-სთეითის ცვლილებისას."
+              ],
+              [
+                "seeking",
+                "აქტიურდება, როდესაც მომხმარებელი იწყებს პოზიციაზე გადახტომას (seek)."
+              ],
+              [
+                "seeked",
+                "აქტიურდება, როდესაც seek ოპერაცია დასრულებულია."
+              ],
+              [
+                "waiting",
+                "აქტიურდება, როდესაც დაკვრა ჩერდება მონაცემების არარსებობის გამო (ბუფერინგი)."
+              ],
+              [
+                "canplay",
+                "აქტიურდება, როდესაც ბრაუზერს შეუძლია მედიის დაკვრის დაწყება (თუმცა შესაძლოა ბუფერინგი გახდეს საჭირო)."
+              ],
+              [
+                "canplaythrough",
+                "აქტიურდება, როდესაც ბრაუზერი მოელის, რომ მედია შეუწყვეტლივ დაიკვრება ბოლომდე."
+              ],
+              [
+                "loadstart",
+                "აქტიურდება, როდესაც ბრაუზერი იწყებს მედია რესურსის ჩატვირთვას."
+              ],
+              [
+                "loadeddata",
+                "აქტიურდება, როდესაც მიმდინარე ფრეიმის მონაცემები ჩატვირთულია."
+              ],
+              [
+                "loadedmetadata",
+                "აქტიურდება, როდესაც მეტამონაცემები (ხანგრძლივობა, განზომილებები) ჩატვირთულია."
+              ],
+              [
+                "stalled",
+                "აქტიურდება, როდესაც ბრაუზერი ცდილობს მონაცემების მოძიებას, მაგრამ ისინი მოულოდნელად არ მოდის."
+              ],
+              [
+                "suspend",
+                "აქტიურდება, როდესაც მედია რესურსის ჩატვირთვა შეჩერებულია (მაგ. სრულად ჩამოტვირთვამდე)."
+              ],
+              [
+                "ratechange",
+                "აქტიურდება დაკვრის სიჩქარის (playback rate) ცვლილებისას."
+              ],
+              [
+                "durationchange",
+                "აქტიურდება მედიის ხანგრძლივობის (duration) ცვლილებისას."
+              ],
+              [
+                "emptied",
+                "აქტიურდება, როდესაც მედია ელემენტი დაცარიელდა (მაგ. src წაშლილია)."
+              ],
+              [
+                "progress",
+                "აქტიურდება მედიის ჩამოტვირთვის პროგრესის განმავლობაში."
+              ]
+            ]
+          },
+          {
+            "id": "window",
+            "color": "#9ad0ff",
+            "name": "Window/Document Events",
+            "short": "გვერდის/ბრაუზერის ფანჯრის state-თან დაკავშირებული გლობალური ივენთები.",
+            "events": [
+              "load",
+              "unload",
+              "beforeunload",
+              "DOMContentLoaded",
+              "resize",
+              "scroll",
+              "hashchange",
+              "popstate",
+              "pagehide",
+              "pageshow",
+              "online",
+              "offline",
+              "visibilitychange",
+              "beforeprint",
+              "afterprint"
+            ],
+            "desc": [
+              [
+                "load",
+                "აქტიურდება, როდესაც გვერდი (ან რესურსი) სრულად ჩატვირთულია, ყველა სურათის, CSS-ის და სხვა ჩათვლით."
+              ],
+              [
+                "unload",
+                "აქტიურდება გვერდის დატოვების მომენტში (deprecated ხშირად, სანაცვლოდ pagehide ურჩევენ)."
+              ],
+              [
+                "beforeunload",
+                "აქტიურდება გვერდის დატოვებამდე, შესაძლებელია confirmation დიალოგის ჩვენება (მაგ. შეუნახავი ცვლილებების გაფრთხილება)."
+              ],
+              [
+                "DOMContentLoaded",
+                "აქტიურდება, როდესაც HTML სრულად არის დამუშავებული და DOM აგებულია, სურათების/სტილების ლოდინის გარეშე."
+              ],
+              [
+                "resize",
+                "აქტიურდება ბრაუზერის ფანჯრის ზომის ცვლილებისას."
+              ],
+              [
+                "scroll",
+                "აქტიურდება გვერდის ან ელემენტის სქროლვისას."
+              ],
+              [
+                "hashchange",
+                "აქტიურდება URL-ის fragment-ის (#-ის შემდეგი ნაწილი) ცვლილებისას."
+              ],
+              [
+                "popstate",
+                "აქტიურდება ბრაუზერის ისტორიაში ნავიგაციისას (back/forward ღილაკები), history.pushState-თან კავშირში."
+              ],
+              [
+                "pagehide",
+                "აქტიურდება, როდესაც მომხმარებელი ტოვებს გვერდს (bfcache-თან თავსებადი ალტერნატივა unload-ის)."
+              ],
+              [
+                "pageshow",
+                "აქტიურდება გვერდის ჩვენებისას, მათ შორის bfcache-დან დაბრუნებისას."
+              ],
+              [
+                "online",
+                "აქტიურდება, როდესაც ბრაუზერი ინტერნეტ კავშირს აღადგენს."
+              ],
+              [
+                "offline",
+                "აქტიურდება, როდესაც ბრაუზერი კარგავს ინტერნეტ კავშირს."
+              ],
+              [
+                "visibilitychange",
+                "აქტიურდება, როდესაც ტაბის ხილვადობის სტატუსი იცვლება (active/hidden)."
+              ],
+              [
+                "beforeprint",
+                "აქტიურდება ბეჭდვის დიალოგის გახსნამდე."
+              ],
+              [
+                "afterprint",
+                "აქტიურდება ბეჭდვის დიალოგის დახურვის შემდეგ."
+              ]
+            ]
+          },
+          {
+            "id": "network",
+            "color": "#8fd07e",
+            "name": "Progress/Network Events",
+            "short": "ქსელური მოთხოვნების პროგრესთან და დასრულებასთან დაკავშირებული ივენთები.",
+            "events": [
+              "loadstart",
+              "progress",
+              "load",
+              "loadend",
+              "error",
+              "abort",
+              "timeout"
+            ],
+            "desc": [
+              [
+                "loadstart",
+                "აქტიურდება, როდესაც ქსელური მოთხოვნა (მაგ. XMLHttpRequest) იწყებს მონაცემების ჩატვირთვას."
+              ],
+              [
+                "progress",
+                "აქტიურდება პერიოდულად მონაცემების გადმოცემის პროცესში, პროგრესის თვალის მისადევნებლად."
+              ],
+              [
+                "load",
+                "აქტიურდება, როდესაც მოთხოვნა წარმატებით დასრულდა."
+              ],
+              [
+                "loadend",
+                "აქტიურდება მოთხოვნის დასრულებისას, წარმატებული იქნება თუ არა (გაერთიანებულია load, error, abort შემდეგ)."
+              ],
+              [
+                "error",
+                "აქტიურდება, როდესაც მოთხოვნისას შეცდომა წარმოიშვა (მაგ. ქსელის პრობლემა)."
+              ],
+              [
+                "abort",
+                "აქტიურდება, როდესაც მოთხოვნა შეწყვეტილია მომხმარებლის ან კოდის მიერ (abort() მეთოდით)."
+              ],
+              [
+                "timeout",
+                "აქტიურდება, როდესაც მოთხოვნამ გადააჭარბა დაშვებულ დროის ლიმიტს."
+              ]
+            ]
+          },
+          {
+            "id": "anim",
+            "color": "#ff9e5c",
+            "name": "Animation & Transition Events",
+            "short": "CSS ანიმაციებისა და ტრანზიციების დაწყება/დასრულებასთან დაკავშირებული ივენთები.",
+            "events": [
+              "animationstart",
+              "animationend",
+              "animationiteration",
+              "animationcancel",
+              "transitionstart",
+              "transitionend",
+              "transitionrun",
+              "transitioncancel"
+            ],
+            "desc": [
+              [
+                "animationstart",
+                "აქტიურდება CSS ანიმაციის დაწყების მომენტში."
+              ],
+              [
+                "animationend",
+                "აქტიურდება CSS ანიმაციის დასრულებისას (ერთი iteration-ის ციკლის ბოლოს)."
+              ],
+              [
+                "animationiteration",
+                "აქტიურდება, როდესაც ანიმაცია იმეორებს საკუთარ ციკლს (animation-iteration-count > 1-ის დროს)."
+              ],
+              [
+                "animationcancel",
+                "აქტიურდება, როდესაც ანიმაცია წყდება დასრულებამდე (მაგ. animation-name-ის წაშლა)."
+              ],
+              [
+                "transitionstart",
+                "აქტიურდება CSS ტრანზიციის დაწყების მომენტში."
+              ],
+              [
+                "transitionend",
+                "აქტიურდება CSS ტრანზიციის დასრულებისას."
+              ],
+              [
+                "transitionrun",
+                "აქტიურდება, როდესაც ტრანზიცია შექმნილია (იწყება delay-ის ჩათვლით, ჯერ არ დაწყებულა ვიზუალურად)."
+              ],
+              [
+                "transitioncancel",
+                "აქტიურდება, როდესაც ტრანზიცია წყდება დასრულებამდე."
+              ]
+            ]
+          },
+          {
+            "id": "storage",
+            "color": "#9ad6a0",
+            "name": "Storage Events",
+            "short": "localStorage/sessionStorage-ის ცვლილებებთან დაკავშირებული ივენთი.",
+            "events": [
+              "storage"
+            ],
+            "desc": [
+              [
+                "storage",
+                "აქტიურდება, როდესაც localStorage-ში (ან sessionStorage-ში) მონაცემები იცვლება სხვა ტაბში/ფანჯარაში იმავე origin-ისთვის — მიმდინარე ტაბზე, სადაც ცვლილება აქტიურდება, ეს ივენთი არ აქტიურდება."
+              ]
+            ]
+          },
+          {
+            "id": "selection",
+            "color": "#d0b0ff",
+            "name": "Selection Events",
+            "short": "ტექსტის მონიშვნასთან დაკავშირებული ივენთები.",
+            "events": [
+              "selectstart",
+              "selectionchange"
+            ],
+            "desc": [
+              [
+                "selectstart",
+                "აქტიურდება, როდესაც მომხმარებელი იწყებს ტექსტის მონიშვნის პროცესს (მონიშვნის დაწყების მომენტი)."
+              ],
+              [
+                "selectionchange",
+                "აქტიურდება, როდესაც დოკუმენტში მონიშნული ტექსტის (Selection) დიაპაზონი იცვლება."
+              ]
+            ]
+          },
+          {
+            "id": "sensor",
+            "color": "#8ad6c8",
+            "name": "Sensor/Device Events",
+            "short": "მოწყობილობის სენსორებთან (ორიენტაცია, მოძრაობა) დაკავშირებული ივენთები.",
+            "events": [
+              "deviceorientation",
+              "devicemotion",
+              "orientationchange"
+            ],
+            "desc": [
+              [
+                "deviceorientation",
+                "აქტიურდება, როდესაც იცვლება მოწყობილობის ფიზიკური ორიენტაცია სივრცეში (alpha, beta, gamma კუთხეები)."
+              ],
+              [
+                "devicemotion",
+                "აქტიურდება, როდესაც იცვლება მოწყობილობის აჩქარება (acceleration) და rotation rate."
+              ],
+              [
+                "orientationchange",
+                "აქტიურდება, როდესაც მოწყობილობა ბრუნავს portrait/landscape რეჟიმებს შორის."
+              ]
+            ]
+          },
+          {
+            "id": "fullscreen",
+            "color": "#ffd08a",
+            "name": "Fullscreen Events",
+            "short": "სრულეკრანიან რეჟიმში გადასვლასთან დაკავშირებული ივენთები.",
+            "events": [
+              "fullscreenchange",
+              "fullscreenerror"
+            ],
+            "desc": [
+              [
+                "fullscreenchange",
+                "აქტიურდება, როდესაც ელემენტი შედის ან გამოდის სრულეკრანიანი რეჟიმიდან."
+              ],
+              [
+                "fullscreenerror",
+                "აქტიურდება, როდესაც სრულეკრანიან რეჟიმზე გადასვლა ვერ მოხერხდა (მაგ. permission-ის უქონლობის გამო)."
+              ]
+            ]
+          },
+          {
+            "id": "gamepad",
+            "color": "#ff9e9e",
+            "name": "Gamepad Events",
+            "short": "გეიმფედის დაკავშირება/გათიშვასთან დაკავშირებული ივენთები.",
+            "events": [
+              "gamepadconnected",
+              "gamepaddisconnected"
+            ],
+            "desc": [
+              [
+                "gamepadconnected",
+                "აქტიურდება, როდესაც ახალი გეიმფედი უკავშირდება ბრაუზერს (პირველი ღილაკის დაჭერის ან ჯოისტიკის მოძრაობის შემდეგ)."
+              ],
+              [
+                "gamepaddisconnected",
+                "აქტიურდება, როდესაც დაკავშირებული გეიმფედი გათიშულია ან აღარ არის ხელმისაწვდომი."
+              ]
+            ]
+          },
+          {
+            "id": "websocket",
+            "color": "#9ac2ff",
+            "name": "WebSocket Events",
+            "short": "WebSocket კავშირის სტატუსთან დაკავშირებული ივენთები.",
+            "events": [
+              "open",
+              "message",
+              "close",
+              "error"
+            ],
+            "desc": [
+              [
+                "open",
+                "აქტიურდება, როდესაც WebSocket კავშირი წარმატებით დამყარდა."
+              ],
+              [
+                "message",
+                "აქტიურდება, როდესაც სერვერიდან მონაცემები მიღებულია WebSocket-ის მეშვეობით."
+              ],
+              [
+                "close",
+                "აქტიურდება, როდესაც WebSocket კავშირი დაიხურა (გამიზნულად ან შეცდომის გამო)."
+              ],
+              [
+                "error",
+                "აქტიურდება, როდესაც WebSocket კავშირზე შეცდომა წარმოიშვა."
+              ]
+            ]
+          },
+          {
+            "id": "sw",
+            "color": "#c0c8ff",
+            "name": "Service Worker / PWA Events",
+            "short": "Service Worker-ის lifecycle-თან და PWA ფუნქციონალთან დაკავშირებული ივენთები.",
+            "events": [
+              "install",
+              "activate",
+              "fetch",
+              "message",
+              "push",
+              "sync",
+              "beforeinstallprompt",
+              "appinstalled"
+            ],
+            "desc": [
+              [
+                "install",
+                "აქტიურდება Service Worker-ის რეგისტრაციისა და ინსტალაციის ფაზაში (cache-ის მომზადებისთვის)."
+              ],
+              [
+                "activate",
+                "აქტიურდება, როდესაც Service Worker აქტიურდება და იღებს კონტროლს გვერდზე (ძველი cache-ის გასუფთავებისთვის ხშირად)."
+              ],
+              [
+                "fetch",
+                "აქტიურდება, როდესაც გვერდიდან ქსელური მოთხოვნა გაივლის Service Worker-ს (intercept-ის შესაძლებლობით)."
+              ],
+              [
+                "message",
+                "აქტიურდება, როდესაც Service Worker იღებს შეტყობინებას მთავარი thread-იდან (postMessage-ით)."
+              ],
+              [
+                "push",
+                "აქტიურდება, როდესაც push notification მიღებულია სერვერისგან."
+              ],
+              [
+                "sync",
+                "აქტიურდება Background Sync API-ის მეშვეობით, როცა კავშირი აღდგება და გადავადებული task-ის შესრულება საჭიროა."
+              ],
+              [
+                "beforeinstallprompt",
+                "აქტიურდება, როდესაც ბრაუზერი ამზადებს PWA-ს ინსტალაციის prompt-ს, მომხმარებლისთვის ჩვენებამდე."
+              ],
+              [
+                "appinstalled",
+                "აქტიურდება, როდესაც PWA წარმატებით დაინსტალირდა მომხმარებლის მოწყობილობაზე."
+              ]
+            ]
+          },
+          {
+            "id": "error",
+            "color": "#ff9a8a",
+            "name": "Error/Security Events",
+            "short": "შეცდომებთან და უსაფრთხოების დარღვევებთან დაკავშირებული ივენთები.",
+            "events": [
+              "error",
+              "securitypolicyviolation",
+              "rejectionhandled",
+              "unhandledrejection"
+            ],
+            "desc": [
+              [
+                "error",
+                "აქტიურდება JavaScript-ის runtime შეცდომისას ან რესურსის (სურათი, სკრიპტი) ჩატვირთვის შეცდომისას."
+              ],
+              [
+                "securitypolicyviolation",
+                "აქტიურდება, როდესაც კონტენტი არღვევს Content Security Policy (CSP) წესებს."
+              ],
+              [
+                "rejectionhandled",
+                "აქტიურდება, როდესაც ადრე დაუმუშავებელი (unhandled) Promise rejection-ს დაემატა .catch() ჰენდლერი შემდგომში."
+              ],
+              [
+                "unhandledrejection",
+                "აქტიურდება, როდესაც Promise rejection-ი დარჩა დაუმუშავებელი (არცერთი .catch() არ დაემატა)."
+              ]
+            ]
+          },
+          {
+            "id": "custom",
+            "color": "#a6d0ff",
+            "name": "Custom Events",
+            "short": "დეველოპერის მიერ განსაზღვრული, dispatchEvent-ის მეშვეობით გამოძახებული ივენთები.",
+            "events": [
+              "CustomEvent"
+            ],
+            "desc": [
+              [
+                "CustomEvent",
+                "ივენთის კონსტრუქტორი, რომელიც საშუალებას აძლევს დეველოპერს შექმნას საკუთარი, სახელობითი ივენთი (new CustomEvent('myEvent', { detail: {...} })) და დამატებითი მონაცემები გადასცეს detail თვისების მეშვეობით; შემდეგ იგზავნება dispatchEvent()-ით და ისმენება addEventListener()-ით."
+              ]
+            ]
+          }
+        ],
+        "searchPlaceholder": "ძიება: ივენთი, კატეგორია ან აღწერა... (Ctrl + K)",
+        "allCategories": "ყველა კატეგორია",
+        "copyTooltip": "კოპირება",
+        "copiedTooltip": "დაკოპირდა!",
+        "copySnippet": "კოდის ასლი",
+        "noResults": "ივენთი ვერ მოიძებნა",
+        "noResultsSub": "სცადეთ სხვა საძიებო სიტყვა",
+        "totalEvents": "სულ {count} ივენთი",
+        "filterNotice": "ნაპოვნია {count} ივენთი",
+        "specTitle": "სპეციფიკაცია და აღწერა",
+        "eventCol": "ივენთის სახელი",
+        "descCol": "მოვლენის აღწერა და ქცევა",
+        "actionsCol": "მოქმედება",
+        "viewCode": "ნახვა",
+        "hideCode": "დამალვა",
+        "viewTooltip": "კოდის ნახვა",
+        "codeExample": "კოდის ნიმუში"
+      },
+      "en": {
+        "title": "JavaScript Events",
+        "tagline": "JavaScript Events — 21 Categories",
+        "catLabel": "Categories",
+        "detailLabel": "Detailed Overview",
+        "countLabel": "events",
+        "items": [
+          {
+            "id": "mouse",
+            "color": "#7fd6a8",
+            "name": "Mouse Events",
+            "short": "Events related to mouse actions (clicking, moving, hovering).",
+            "events": [
+              "click",
+              "dblclick",
+              "mousedown",
+              "mouseup",
+              "mousemove",
+              "mouseenter",
+              "mouseleave",
+              "mouseover",
+              "mouseout",
+              "contextmenu",
+              "auxclick",
+              "wheel"
+            ],
+            "desc": [
+              [
+                "click",
+                "Fires when the element is clicked with the mouse (mousedown + mouseup on the same element)."
+              ],
+              [
+                "dblclick",
+                "Fires on a quick double-click."
+              ],
+              [
+                "mousedown",
+                "Fires at the moment the mouse button is pressed (not yet released)."
+              ],
+              [
+                "mouseup",
+                "Fires at the moment the mouse button is released."
+              ],
+              [
+                "mousemove",
+                "Fires on any movement of the mouse cursor within the element."
+              ],
+              [
+                "mouseenter",
+                "Fires when the mouse enters the element; does not bubble; affects only the target element."
+              ],
+              [
+                "mouseleave",
+                "Fires when the mouse leaves the element; also does not bubble."
+              ],
+              [
+                "mouseover",
+                "Fires when the mouse enters the element or one of its children; bubbles."
+              ],
+              [
+                "mouseout",
+                "Fires when the mouse leaves the element or one of its children; also bubbles."
+              ],
+              [
+                "contextmenu",
+                "Fires on a right-click (right-button click), before the context menu is shown."
+              ],
+              [
+                "auxclick",
+                "Fires when clicked with a non-primary button (e.g. middle-click), unlike click."
+              ],
+              [
+                "wheel",
+                "Fires when the mouse wheel (scroll wheel) is rotated."
+              ]
+            ]
+          },
+          {
+            "id": "keyboard",
+            "color": "#f5a97f",
+            "name": "Keyboard Events",
+            "short": "Events related to pressing keys on the keyboard.",
+            "events": [
+              "keydown",
+              "keyup",
+              "keypress (deprecated)"
+            ],
+            "desc": [
+              [
+                "keydown",
+                "Fires at the moment a key is pressed; repeats if the key is held down (holding)."
+              ],
+              [
+                "keyup",
+                "Fires at the moment a key is released."
+              ],
+              [
+                "keypress (deprecated)",
+                "Previously fired when a character was generated (only on character keys); now keydown/input is recommended."
+              ]
+            ]
+          },
+          {
+            "id": "form",
+            "color": "#8bd5ff",
+            "name": "Form Events",
+            "short": "Events related to forms and input fields (submission, value changes).",
+            "events": [
+              "submit",
+              "reset",
+              "change",
+              "input",
+              "invalid",
+              "select",
+              "formdata"
+            ],
+            "desc": [
+              [
+                "submit",
+                "Fires at the moment the form is submitted (by clicking the submit button or pressing Enter)."
+              ],
+              [
+                "reset",
+                "Fires when the form returns to its initial state (by clicking the reset button)."
+              ],
+              [
+                "change",
+                "Fires when an input's value changes and the element loses focus (after commit)."
+              ],
+              [
+                "input",
+                "Fires directly when the value changes, in real time (after every keystroke)."
+              ],
+              [
+                "invalid",
+                "Fires when a field fails validation during submit (e.g. a required field is empty)."
+              ],
+              [
+                "select",
+                "Fires when text is selected inside an input/textarea element."
+              ],
+              [
+                "formdata",
+                "Fires when the form's data is assembled into a FormData object (during submit)."
+              ]
+            ]
+          },
+          {
+            "id": "focus",
+            "color": "#ffd28a",
+            "name": "Focus Events",
+            "short": "Events related to gaining/losing focus on an element.",
+            "events": [
+              "focus",
+              "blur",
+              "focusin",
+              "focusout"
+            ],
+            "desc": [
+              [
+                "focus",
+                "Fires at the moment an element receives focus; does not bubble."
+              ],
+              [
+                "blur",
+                "Fires at the moment an element loses focus; also does not bubble."
+              ],
+              [
+                "focusin",
+                "Same as focus but bubbles; can be caught on a parent element."
+              ],
+              [
+                "focusout",
+                "Same as blur but bubbles."
+              ]
+            ]
+          },
+          {
+            "id": "clipboard",
+            "color": "#c8a6ff",
+            "name": "Clipboard Events",
+            "short": "Events related to copy/cut/paste actions.",
+            "events": [
+              "copy",
+              "cut",
+              "paste"
+            ],
+            "desc": [
+              [
+                "copy",
+                "Fires when the user copies the selected content (Ctrl+C or via the context menu)."
+              ],
+              [
+                "cut",
+                "Fires when the user cuts the selected content (Ctrl+X), which removes it from the source."
+              ],
+              [
+                "paste",
+                "Fires when content from the clipboard is pasted into an element (Ctrl+V)."
+              ]
+            ]
+          },
+          {
+            "id": "dragdrop",
+            "color": "#7ee0d8",
+            "name": "Drag & Drop Events",
+            "short": "Events related to dragging and dropping elements.",
+            "events": [
+              "dragstart",
+              "drag",
+              "dragenter",
+              "dragover",
+              "dragleave",
+              "drop",
+              "dragend"
+            ],
+            "desc": [
+              [
+                "dragstart",
+                "Fires when the user starts dragging an element (the moment the drag begins)."
+              ],
+              [
+                "drag",
+                "Fires repeatedly throughout the dragging process (similar to mousemove)."
+              ],
+              [
+                "dragenter",
+                "Fires when the dragged element enters the area of a possible drop target."
+              ],
+              [
+                "dragover",
+                "Fires repeatedly while the dragged element is over a drop target (preventDefault() is required to allow the drop)."
+              ],
+              [
+                "dragleave",
+                "Fires when the dragged element leaves the area of a drop target."
+              ],
+              [
+                "drop",
+                "Fires when the dragged element is dropped on the target."
+              ],
+              [
+                "dragend",
+                "Fires when the drag operation ends (successful or not)."
+              ]
+            ]
+          },
+          {
+            "id": "touch",
+            "color": "#ff9ec4",
+            "name": "Touch Events",
+            "short": "Events related to touching a touchscreen with a finger.",
+            "events": [
+              "touchstart",
+              "touchmove",
+              "touchend",
+              "touchcancel"
+            ],
+            "desc": [
+              [
+                "touchstart",
+                "Fires when a finger touches the screen (one or more touch points)."
+              ],
+              [
+                "touchmove",
+                "Fires as the finger moves across the screen while keeping contact."
+              ],
+              [
+                "touchend",
+                "Fires when the finger leaves the screen (end of touch)."
+              ],
+              [
+                "touchcancel",
+                "Fires when the touch process is interrupted by an external factor (e.g. a system alert or the finger leaving the area)."
+              ]
+            ]
+          },
+          {
+            "id": "pointer",
+            "color": "#6fb5ff",
+            "name": "Pointer Events",
+            "short": "Unified events combining mouse, touch, and pen input.",
+            "events": [
+              "pointerdown",
+              "pointerup",
+              "pointermove",
+              "pointerover",
+              "pointerout",
+              "pointerenter",
+              "pointerleave",
+              "pointercancel",
+              "gotpointercapture",
+              "lostpointercapture"
+            ],
+            "desc": [
+              [
+                "pointerdown",
+                "Fires when any pointer (mouse, finger, pen) is activated, at the moment contact begins."
+              ],
+              [
+                "pointerup",
+                "Fires when the pointer's contact ends (button release or finger lift)."
+              ],
+              [
+                "pointermove",
+                "Fires as the pointer moves."
+              ],
+              [
+                "pointerover",
+                "Fires when the pointer enters the element or one of its children; bubbles."
+              ],
+              [
+                "pointerout",
+                "Fires when the pointer leaves the element or one of its children; bubbles."
+              ],
+              [
+                "pointerenter",
+                "Fires when the pointer enters the element; does not bubble (similar to mouseenter)."
+              ],
+              [
+                "pointerleave",
+                "Fires when the pointer leaves the element; does not bubble (similar to mouseleave)."
+              ],
+              [
+                "pointercancel",
+                "Fires when the pointer interaction is unexpectedly interrupted (e.g. a system gesture cancels it)."
+              ],
+              [
+                "gotpointercapture",
+                "Fires when an element receives pointer capture (all subsequent events are directed to it)."
+              ],
+              [
+                "lostpointercapture",
+                "Fires when the element loses pointer capture."
+              ]
+            ]
+          },
+          {
+            "id": "media",
+            "color": "#ffb45c",
+            "name": "Media Events (audio/video)",
+            "short": "Events related to state changes of video/audio elements.",
+            "events": [
+              "play",
+              "pause",
+              "ended",
+              "timeupdate",
+              "volumechange",
+              "seeking",
+              "seeked",
+              "waiting",
+              "canplay",
+              "canplaythrough",
+              "loadstart",
+              "loadeddata",
+              "loadedmetadata",
+              "stalled",
+              "suspend",
+              "ratechange",
+              "durationchange",
+              "emptied",
+              "progress"
+            ],
+            "desc": [
+              [
+                "play",
+                "Fires when media starts/resumes playing (transition from paused to playing)."
+              ],
+              [
+                "pause",
+                "Fires at the moment the media is paused."
+              ],
+              [
+                "ended",
+                "Fires when the media has finished (played all the way through)."
+              ],
+              [
+                "timeupdate",
+                "Fires as the media's playback time (currentTime) updates, frequently."
+              ],
+              [
+                "volumechange",
+                "Fires when the volume level or mute state changes."
+              ],
+              [
+                "seeking",
+                "Fires when the user starts jumping to a position (seeking)."
+              ],
+              [
+                "seeked",
+                "Fires when the seek operation is complete."
+              ],
+              [
+                "waiting",
+                "Fires when playback stops due to a lack of data (buffering)."
+              ],
+              [
+                "canplay",
+                "Fires when the browser can start playing the media (though buffering may still be needed)."
+              ],
+              [
+                "canplaythrough",
+                "Fires when the browser expects the media to play through to the end without interruption."
+              ],
+              [
+                "loadstart",
+                "Fires when the browser starts loading the media resource."
+              ],
+              [
+                "loadeddata",
+                "Fires when the current frame's data is loaded."
+              ],
+              [
+                "loadedmetadata",
+                "Fires when metadata (duration, dimensions) is loaded."
+              ],
+              [
+                "stalled",
+                "Fires when the browser tries to fetch data but it unexpectedly does not arrive."
+              ],
+              [
+                "suspend",
+                "Fires when loading of the media resource is paused (e.g. before it is fully downloaded)."
+              ],
+              [
+                "ratechange",
+                "Fires when the playback rate changes."
+              ],
+              [
+                "durationchange",
+                "Fires when the media duration changes."
+              ],
+              [
+                "emptied",
+                "Fires when the media element is emptied (e.g. src is removed)."
+              ],
+              [
+                "progress",
+                "Fires throughout the media download progress."
+              ]
+            ]
+          },
+          {
+            "id": "window",
+            "color": "#9ad0ff",
+            "name": "Window/Document Events",
+            "short": "Global events related to the page/browser window state.",
+            "events": [
+              "load",
+              "unload",
+              "beforeunload",
+              "DOMContentLoaded",
+              "resize",
+              "scroll",
+              "hashchange",
+              "popstate",
+              "pagehide",
+              "pageshow",
+              "online",
+              "offline",
+              "visibilitychange",
+              "beforeprint",
+              "afterprint"
+            ],
+            "desc": [
+              [
+                "load",
+                "Fires when the page (or resource) is fully loaded, including all images, CSS, and others."
+              ],
+              [
+                "unload",
+                "Fires at the moment the page is left (often deprecated; pagehide is recommended instead)."
+              ],
+              [
+                "beforeunload",
+                "Fires before the page is left; can show a confirmation dialog (e.g. warning about unsaved changes)."
+              ],
+              [
+                "DOMContentLoaded",
+                "Fires when the HTML is fully processed and the DOM is built, without waiting for images/styles."
+              ],
+              [
+                "resize",
+                "Fires when the browser window size changes."
+              ],
+              [
+                "scroll",
+                "Fires when the page or an element is scrolled."
+              ],
+              [
+                "hashchange",
+                "Fires when the URL fragment (the part after #) changes."
+              ],
+              [
+                "popstate",
+                "Fires when navigating in the browser history (back/forward buttons), in connection with history.pushState."
+              ],
+              [
+                "pagehide",
+                "Fires when the user leaves the page (a bfcache-compatible alternative to unload)."
+              ],
+              [
+                "pageshow",
+                "Fires when the page is shown, including when returning from the bfcache."
+              ],
+              [
+                "online",
+                "Fires when the browser regains an internet connection."
+              ],
+              [
+                "offline",
+                "Fires when the browser loses its internet connection."
+              ],
+              [
+                "visibilitychange",
+                "Fires when the tab's visibility status changes (active/hidden)."
+              ],
+              [
+                "beforeprint",
+                "Fires before the print dialog opens."
+              ],
+              [
+                "afterprint",
+                "Fires after the print dialog closes."
+              ]
+            ]
+          },
+          {
+            "id": "network",
+            "color": "#8fd07e",
+            "name": "Progress/Network Events",
+            "short": "Events related to the progress and completion of network requests.",
+            "events": [
+              "loadstart",
+              "progress",
+              "load",
+              "loadend",
+              "error",
+              "abort",
+              "timeout"
+            ],
+            "desc": [
+              [
+                "loadstart",
+                "Fires when a network request (e.g. XMLHttpRequest) starts loading data."
+              ],
+              [
+                "progress",
+                "Fires periodically during data transfer, to track progress."
+              ],
+              [
+                "load",
+                "Fires when the request completes successfully."
+              ],
+              [
+                "loadend",
+                "Fires when the request ends, whether successful or not (combined after load, error, abort)."
+              ],
+              [
+                "error",
+                "Fires when an error occurs during the request (e.g. a network problem)."
+              ],
+              [
+                "abort",
+                "Fires when the request is aborted by the user or code (via the abort() method)."
+              ],
+              [
+                "timeout",
+                "Fires when the request exceeds the allowed time limit."
+              ]
+            ]
+          },
+          {
+            "id": "anim",
+            "color": "#ff9e5c",
+            "name": "Animation & Transition Events",
+            "short": "Events related to the start/end of CSS animations and transitions.",
+            "events": [
+              "animationstart",
+              "animationend",
+              "animationiteration",
+              "animationcancel",
+              "transitionstart",
+              "transitionend",
+              "transitionrun",
+              "transitioncancel"
+            ],
+            "desc": [
+              [
+                "animationstart",
+                "Fires at the moment a CSS animation starts."
+              ],
+              [
+                "animationend",
+                "Fires when a CSS animation ends (at the end of one iteration cycle)."
+              ],
+              [
+                "animationiteration",
+                "Fires when an animation repeats its own cycle (when animation-iteration-count > 1)."
+              ],
+              [
+                "animationcancel",
+                "Fires when the animation is interrupted before completion (e.g. animation-name is removed)."
+              ],
+              [
+                "transitionstart",
+                "Fires at the moment a CSS transition starts."
+              ],
+              [
+                "transitionend",
+                "Fires when a CSS transition ends."
+              ],
+              [
+                "transitionrun",
+                "Fires when a transition is created (including its delay; it has not started visually yet)."
+              ],
+              [
+                "transitioncancel",
+                "Fires when the transition is interrupted before completion."
+              ]
+            ]
+          },
+          {
+            "id": "storage",
+            "color": "#9ad6a0",
+            "name": "Storage Events",
+            "short": "An event related to localStorage/sessionStorage changes.",
+            "events": [
+              "storage"
+            ],
+            "desc": [
+              [
+                "storage",
+                "Fires when data in localStorage (or sessionStorage) changes in another tab/window for the same origin — it does not fire in the current tab where the change happens."
+              ]
+            ]
+          },
+          {
+            "id": "selection",
+            "color": "#d0b0ff",
+            "name": "Selection Events",
+            "short": "Events related to text selection.",
+            "events": [
+              "selectstart",
+              "selectionchange"
+            ],
+            "desc": [
+              [
+                "selectstart",
+                "Fires when the user starts the text selection process (the moment selection begins)."
+              ],
+              [
+                "selectionchange",
+                "Fires when the range of selected text (Selection) in the document changes."
+              ]
+            ]
+          },
+          {
+            "id": "sensor",
+            "color": "#8ad6c8",
+            "name": "Sensor/Device Events",
+            "short": "Events related to device sensors (orientation, movement).",
+            "events": [
+              "deviceorientation",
+              "devicemotion",
+              "orientationchange"
+            ],
+            "desc": [
+              [
+                "deviceorientation",
+                "Fires when the device's physical orientation in space changes (alpha, beta, gamma angles)."
+              ],
+              [
+                "devicemotion",
+                "Fires when the device's acceleration and rotation rate change."
+              ],
+              [
+                "orientationchange",
+                "Fires when the device rotates between portrait and landscape modes."
+              ]
+            ]
+          },
+          {
+            "id": "fullscreen",
+            "color": "#ffd08a",
+            "name": "Fullscreen Events",
+            "short": "Events related to entering/exiting fullscreen mode.",
+            "events": [
+              "fullscreenchange",
+              "fullscreenerror"
+            ],
+            "desc": [
+              [
+                "fullscreenchange",
+                "Fires when an element enters or exits fullscreen mode."
+              ],
+              [
+                "fullscreenerror",
+                "Fires when entering fullscreen fails (e.g. due to a lack of permission)."
+              ]
+            ]
+          },
+          {
+            "id": "gamepad",
+            "color": "#ff9e9e",
+            "name": "Gamepad Events",
+            "short": "Events related to gamepad connection/disconnection.",
+            "events": [
+              "gamepadconnected",
+              "gamepaddisconnected"
+            ],
+            "desc": [
+              [
+                "gamepadconnected",
+                "Fires when a new gamepad connects to the browser (after the first button press or joystick movement)."
+              ],
+              [
+                "gamepaddisconnected",
+                "Fires when a connected gamepad is disconnected or is no longer available."
+              ]
+            ]
+          },
+          {
+            "id": "websocket",
+            "color": "#9ac2ff",
+            "name": "WebSocket Events",
+            "short": "Events related to WebSocket connection status.",
+            "events": [
+              "open",
+              "message",
+              "close",
+              "error"
+            ],
+            "desc": [
+              [
+                "open",
+                "Fires when the WebSocket connection is successfully established."
+              ],
+              [
+                "message",
+                "Fires when data is received from the server via WebSocket."
+              ],
+              [
+                "close",
+                "Fires when the WebSocket connection is closed (intentionally or due to an error)."
+              ],
+              [
+                "error",
+                "Fires when an error occurs on the WebSocket connection."
+              ]
+            ]
+          },
+          {
+            "id": "sw",
+            "color": "#c0c8ff",
+            "name": "Service Worker / PWA Events",
+            "short": "Events related to Service Worker lifecycle and PWA functionality.",
+            "events": [
+              "install",
+              "activate",
+              "fetch",
+              "message",
+              "push",
+              "sync",
+              "beforeinstallprompt",
+              "appinstalled"
+            ],
+            "desc": [
+              [
+                "install",
+                "Fires in the registration and installation phase of the Service Worker (for preparing the cache)."
+              ],
+              [
+                "activate",
+                "Fires when the Service Worker activates and takes control of the page (often to clean old caches)."
+              ],
+              [
+                "fetch",
+                "Fires when a network request from the page passes through the Service Worker (with the ability to intercept it)."
+              ],
+              [
+                "message",
+                "Fires when the Service Worker receives a message from the main thread (via postMessage)."
+              ],
+              [
+                "push",
+                "Fires when a push notification is received from the server."
+              ],
+              [
+                "sync",
+                "Fires via the Background Sync API when the connection is restored and a deferred task needs to be executed."
+              ],
+              [
+                "beforeinstallprompt",
+                "Fires when the browser prepares a PWA installation prompt, before showing it to the user."
+              ],
+              [
+                "appinstalled",
+                "Fires when the PWA is successfully installed on the user's device."
+              ]
+            ]
+          },
+          {
+            "id": "error",
+            "color": "#ff9a8a",
+            "name": "Error/Security Events",
+            "short": "Events related to errors and security violations.",
+            "events": [
+              "error",
+              "securitypolicyviolation",
+              "rejectionhandled",
+              "unhandledrejection"
+            ],
+            "desc": [
+              [
+                "error",
+                "Fires on a JavaScript runtime error or when loading a resource (image, script) fails."
+              ],
+              [
+                "securitypolicyviolation",
+                "Fires when content violates Content Security Policy (CSP) rules."
+              ],
+              [
+                "rejectionhandled",
+                "Fires when a previously unhandled Promise rejection later has a .catch() handler added."
+              ],
+              [
+                "unhandledrejection",
+                "Fires when a Promise rejection remains unhandled (no .catch() was added)."
+              ]
+            ]
+          },
+          {
+            "id": "custom",
+            "color": "#a6d0ff",
+            "name": "Custom Events",
+            "short": "Events defined by the developer, dispatched via dispatchEvent.",
+            "events": [
+              "CustomEvent"
+            ],
+            "desc": [
+              [
+                "CustomEvent",
+                "An event constructor that lets developers create their own named event (new CustomEvent('myEvent', { detail: {...} })) and pass extra data via the detail property; it is then dispatched with dispatchEvent() and listened to with addEventListener()."
+              ]
+            ]
+          }
+        ],
+        "searchPlaceholder": "Search events, categories, or keywords... (Ctrl + K)",
+        "allCategories": "All Categories",
+        "copyTooltip": "Copy",
+        "copiedTooltip": "Copied!",
+        "copySnippet": "Copy Snippet",
+        "noResults": "No events found",
+        "noResultsSub": "Try a different search query",
+        "totalEvents": "{count} total events",
+        "filterNotice": "Found {count} events",
+        "specTitle": "Specification & Description",
+        "eventCol": "Event Name",
+        "descCol": "Behavior & Description",
+        "actionsCol": "Actions",
+        "viewCode": "View",
+        "hideCode": "Hide",
+        "viewTooltip": "View code snippet",
+        "codeExample": "Code Snippet"
+      },
+      "ru": {
+        "title": "JavaScript Events",
+        "tagline": "JavaScript Events — 21 категория",
+        "catLabel": "Категории",
+        "detailLabel": "Подробный обзор",
+        "countLabel": "событий",
+        "items": [
+          {
+            "id": "mouse",
+            "color": "#7fd6a8",
+            "name": "Mouse Events",
+            "short": "События, связанные с действиями мыши (нажатие, движение, наведение).",
+            "events": [
+              "click",
+              "dblclick",
+              "mousedown",
+              "mouseup",
+              "mousemove",
+              "mouseenter",
+              "mouseleave",
+              "mouseover",
+              "mouseout",
+              "contextmenu",
+              "auxclick",
+              "wheel"
+            ],
+            "desc": [
+              [
+                "click",
+                "Происходит при клике мышью по элементу (mousedown + mouseup на одном и том же элементе)."
+              ],
+              [
+                "dblclick",
+                "Срабатывает при быстром двойном клике."
+              ],
+              [
+                "mousedown",
+                "Происходит в момент нажатия кнопки мыши (ещё не отпущена)."
+              ],
+              [
+                "mouseup",
+                "Происходит в момент отпускания кнопки мыши."
+              ],
+              [
+                "mousemove",
+                "Происходит при любом движении курсора в пределах элемента."
+              ],
+              [
+                "mouseenter",
+                "Срабатывает при входе мыши в элемент; не всплывает; действует только на целевой элемент."
+              ],
+              [
+                "mouseleave",
+                "Срабатывает при выходе мыши из элемента; также не всплывает."
+              ],
+              [
+                "mouseover",
+                "Происходит при входе мыши на элемент или его дочерний элемент; всплывает."
+              ],
+              [
+                "mouseout",
+                "Происходит при выходе мыши из элемента или его дочернего элемента; тоже всплывает."
+              ],
+              [
+                "contextmenu",
+                "Происходит при клике правой кнопкой, до вызова контекстного меню."
+              ],
+              [
+                "auxclick",
+                "Происходит при клике не основной кнопкой (например, средняя кнопка), в отличие от click."
+              ],
+              [
+                "wheel",
+                "Происходит при вращении колеса мыши."
+              ]
+            ]
+          },
+          {
+            "id": "keyboard",
+            "color": "#f5a97f",
+            "name": "Keyboard Events",
+            "short": "События, связанные с нажатием клавиш на клавиатуре.",
+            "events": [
+              "keydown",
+              "keyup",
+              "keypress (deprecated)"
+            ],
+            "desc": [
+              [
+                "keydown",
+                "Происходит в момент нажатия клавиши; повторяется, если клавиша удерживается."
+              ],
+              [
+                "keyup",
+                "Происходит в момент отпускания клавиши."
+              ],
+              [
+                "keypress (deprecated)",
+                "Ранее срабатывал при генерации символа (только на символьных клавишах); теперь рекомендуется keydown/input."
+              ]
+            ]
+          },
+          {
+            "id": "form",
+            "color": "#8bd5ff",
+            "name": "Form Events",
+            "short": "События, связанные с формами и полями ввода (отправка, изменение значений).",
+            "events": [
+              "submit",
+              "reset",
+              "change",
+              "input",
+              "invalid",
+              "select",
+              "formdata"
+            ],
+            "desc": [
+              [
+                "submit",
+                "Происходит в момент отправки формы (нажатием кнопки submit или Enter)."
+              ],
+              [
+                "reset",
+                "Происходит при возврате формы в исходное состояние (нажатием кнопки reset)."
+              ],
+              [
+                "change",
+                "Срабатывает, когда значение поля изменилось и элемент потерял фокус (после commit)."
+              ],
+              [
+                "input",
+                "Срабатывает непосредственно при изменении значения, в реальном времени (после каждого нажатия клавиши)."
+              ],
+              [
+                "invalid",
+                "Происходит, когда поле не проходит валидацию при submit (например, обязательное поле пустое)."
+              ],
+              [
+                "select",
+                "Срабатывает, когда текст выделен в элементе input/textarea."
+              ],
+              [
+                "formdata",
+                "Происходит при сборке данных формы в объект FormData (при submit)."
+              ]
+            ]
+          },
+          {
+            "id": "focus",
+            "color": "#ffd28a",
+            "name": "Focus Events",
+            "short": "События, связанные с получением/потерей фокуса элементом.",
+            "events": [
+              "focus",
+              "blur",
+              "focusin",
+              "focusout"
+            ],
+            "desc": [
+              [
+                "focus",
+                "Происходит в момент получения фокуса элементом; не всплывает."
+              ],
+              [
+                "blur",
+                "Происходит в момент потери фокуса элементом; также не всплывает."
+              ],
+              [
+                "focusin",
+                "То же, что focus, но всплывает; можно поймать и на родительском элементе."
+              ],
+              [
+                "focusout",
+                "То же, что blur, но всплывает."
+              ]
+            ]
+          },
+          {
+            "id": "clipboard",
+            "color": "#c8a6ff",
+            "name": "Clipboard Events",
+            "short": "События, связанные с копированием/вырезанием/вставкой.",
+            "events": [
+              "copy",
+              "cut",
+              "paste"
+            ],
+            "desc": [
+              [
+                "copy",
+                "Происходит, когда пользователь копирует выделенный контент (Ctrl+C или через контекстное меню)."
+              ],
+              [
+                "cut",
+                "Происходит, когда пользователь вырезает выделенный контент (Ctrl+X), удаляя его из источника."
+              ],
+              [
+                "paste",
+                "Происходит, когда контент из буфера обмена вставляется в элемент (Ctrl+V)."
+              ]
+            ]
+          },
+          {
+            "id": "dragdrop",
+            "color": "#7ee0d8",
+            "name": "Drag & Drop Events",
+            "short": "События, связанные с перетаскиванием и сбросом элементов.",
+            "events": [
+              "dragstart",
+              "drag",
+              "dragenter",
+              "dragover",
+              "dragleave",
+              "drop",
+              "dragend"
+            ],
+            "desc": [
+              [
+                "dragstart",
+                "Происходит, когда пользователь начинает перетаскивать элемент (момент начала перетаскивания)."
+              ],
+              [
+                "drag",
+                "Срабатывает многократно во время перетаскивания (аналогично mousemove)."
+              ],
+              [
+                "dragenter",
+                "Происходит, когда перетаскиваемый элемент входит в область возможной цели сброса."
+              ],
+              [
+                "dragover",
+                "Срабатывает многократно, пока перетаскиваемый элемент находится над целью (preventDefault() обязателен для разрешения сброса)."
+              ],
+              [
+                "dragleave",
+                "Происходит, когда перетаскиваемый элемент покидает область цели сброса."
+              ],
+              [
+                "drop",
+                "Происходит, когда перетаскиваемый элемент сбрасывается на цель."
+              ],
+              [
+                "dragend",
+                "Происходит по завершении операции перетаскивания (вне зависимости от успеха)."
+              ]
+            ]
+          },
+          {
+            "id": "touch",
+            "color": "#ff9ec4",
+            "name": "Touch Events",
+            "short": "События, связанные с касанием сенсорного экрана пальцем.",
+            "events": [
+              "touchstart",
+              "touchmove",
+              "touchend",
+              "touchcancel"
+            ],
+            "desc": [
+              [
+                "touchstart",
+                "Происходит, когда палец касается экрана (одна или несколько точек касания)."
+              ],
+              [
+                "touchmove",
+                "Срабатывает при движении пальца по экрану при сохранении контакта."
+              ],
+              [
+                "touchend",
+                "Происходит, когда палец отрывается от экрана (завершение касания)."
+              ],
+              [
+                "touchcancel",
+                "Происходит, когда процесс касания прерывается внешним фактором (например, системным alert или выходом пальца из области)."
+              ]
+            ]
+          },
+          {
+            "id": "pointer",
+            "color": "#6fb5ff",
+            "name": "Pointer Events",
+            "short": "Унифицированные события, объединяющие ввод мыши, пальца и пера.",
+            "events": [
+              "pointerdown",
+              "pointerup",
+              "pointermove",
+              "pointerover",
+              "pointerout",
+              "pointerenter",
+              "pointerleave",
+              "pointercancel",
+              "gotpointercapture",
+              "lostpointercapture"
+            ],
+            "desc": [
+              [
+                "pointerdown",
+                "Происходит при активации любого указателя (мышь, палец, перо) в момент начала контакта."
+              ],
+              [
+                "pointerup",
+                "Происходит при завершении контакта указателя (отпускание кнопки или подъём пальца)."
+              ],
+              [
+                "pointermove",
+                "Срабатывает при движении указателя."
+              ],
+              [
+                "pointerover",
+                "Происходит при входе указателя на элемент или его дочерний элемент; всплывает."
+              ],
+              [
+                "pointerout",
+                "Происходит при выходе указателя из элемента или его дочернего элемента; всплывает."
+              ],
+              [
+                "pointerenter",
+                "При входе указателя в элемент; не всплывает (аналогично mouseenter)."
+              ],
+              [
+                "pointerleave",
+                "При выходе указателя из элемента; не всплывает (аналогично mouseleave)."
+              ],
+              [
+                "pointercancel",
+                "Происходит, когда взаимодействие указателя неожиданно прерывается (например, системный жест прервал его)."
+              ],
+              [
+                "gotpointercapture",
+                "Происходит, когда элемент получил захват указателя (все последующие события направляются ему)."
+              ],
+              [
+                "lostpointercapture",
+                "Происходит, когда элемент потерял захват указателя."
+              ]
+            ]
+          },
+          {
+            "id": "media",
+            "color": "#ffb45c",
+            "name": "Media Events (audio/video)",
+            "short": "События, связанные с изменениями состояния видео/аудио элементов.",
+            "events": [
+              "play",
+              "pause",
+              "ended",
+              "timeupdate",
+              "volumechange",
+              "seeking",
+              "seeked",
+              "waiting",
+              "canplay",
+              "canplaythrough",
+              "loadstart",
+              "loadeddata",
+              "loadedmetadata",
+              "stalled",
+              "suspend",
+              "ratechange",
+              "durationchange",
+              "emptied",
+              "progress"
+            ],
+            "desc": [
+              [
+                "play",
+                "Происходит, когда медиа начинает/продолжает воспроизведение (переход из paused в playing)."
+              ],
+              [
+                "pause",
+                "Происходит в момент паузы медиа."
+              ],
+              [
+                "ended",
+                "Происходит, когда медиа завершилось (полностью проиграно до конца)."
+              ],
+              [
+                "timeupdate",
+                "Срабатывает при обновлении времени воспроизведения (currentTime), часто."
+              ],
+              [
+                "volumechange",
+                "Происходит при изменении уровня громкости или состояния mute."
+              ],
+              [
+                "seeking",
+                "Происходит, когда пользователь начинает переходить к позиции (seek)."
+              ],
+              [
+                "seeked",
+                "Происходит, когда операция seek завершена."
+              ],
+              [
+                "waiting",
+                "Происходит, когда воспроизведение останавливается из-за отсутствия данных (буферизация)."
+              ],
+              [
+                "canplay",
+                "Происходит, когда браузер может начать воспроизведение медиа (буферизация всё ещё может потребоваться)."
+              ],
+              [
+                "canplaythrough",
+                "Происходит, когда браузер ожидает беспрерывного воспроизведения до конца."
+              ],
+              [
+                "loadstart",
+                "Происходит, когда браузер начинает загрузку медиа-ресурса."
+              ],
+              [
+                "loadeddata",
+                "Происходит, когда данные текущего кадра загружены."
+              ],
+              [
+                "loadedmetadata",
+                "Происходит, когда загружены метаданные (длительность, размеры)."
+              ],
+              [
+                "stalled",
+                "Происходит, когда браузер пытается получить данные, но они неожиданно не приходят."
+              ],
+              [
+                "suspend",
+                "Происходит, когда загрузка медиа-ресурса приостановлена (например, до полной загрузки)."
+              ],
+              [
+                "ratechange",
+                "Происходит при изменении скорости воспроизведения (playback rate)."
+              ],
+              [
+                "durationchange",
+                "Происходит при изменении длительности (duration) медиа."
+              ],
+              [
+                "emptied",
+                "Происходит, когда медиа-элемент опустошён (например, удалён src)."
+              ],
+              [
+                "progress",
+                "Срабатывает в течение загрузки медиа, отслеживая прогресс."
+              ]
+            ]
+          },
+          {
+            "id": "window",
+            "color": "#9ad0ff",
+            "name": "Window/Document Events",
+            "short": "Глобальные события, связанные с состоянием страницы/окна браузера.",
+            "events": [
+              "load",
+              "unload",
+              "beforeunload",
+              "DOMContentLoaded",
+              "resize",
+              "scroll",
+              "hashchange",
+              "popstate",
+              "pagehide",
+              "pageshow",
+              "online",
+              "offline",
+              "visibilitychange",
+              "beforeprint",
+              "afterprint"
+            ],
+            "desc": [
+              [
+                "load",
+                "Происходит, когда страница (или ресурс) полностью загружена, включая все изображения, CSS и другое."
+              ],
+              [
+                "unload",
+                "Происходит в момент ухода со страницы (часто устарел; вместо него рекомендуют pagehide)."
+              ],
+              [
+                "beforeunload",
+                "Происходит перед уходом со страницы; возможно показать диалог подтверждения (например, предупреждение о несохранённых изменениях)."
+              ],
+              [
+                "DOMContentLoaded",
+                "Происходит, когда HTML полностью обработан и DOM построен, без ожидания изображений/стилей."
+              ],
+              [
+                "resize",
+                "Происходит при изменении размера окна браузера."
+              ],
+              [
+                "scroll",
+                "Происходит при прокрутке страницы или элемента."
+              ],
+              [
+                "hashchange",
+                "Происходит при изменении фрагмента URL (части после #)."
+              ],
+              [
+                "popstate",
+                "Происходит при навигации в истории браузера (кнопки назад/вперёд), в связи с history.pushState."
+              ],
+              [
+                "pagehide",
+                "Происходит, когда пользователь покидает страницу (совместимая с bfcache альтернатива unload)."
+              ],
+              [
+                "pageshow",
+                "Происходит при показе страницы, в том числе при возврате из bfcache."
+              ],
+              [
+                "online",
+                "Происходит, когда браузер восстанавливает интернет-соединение."
+              ],
+              [
+                "offline",
+                "Происходит, когда браузер теряет интернет-соединение."
+              ],
+              [
+                "visibilitychange",
+                "Происходит при изменении статуса видимости вкладки (active/hidden)."
+              ],
+              [
+                "beforeprint",
+                "Происходит перед открытием диалога печати."
+              ],
+              [
+                "afterprint",
+                "Происходит после закрытия диалога печати."
+              ]
+            ]
+          },
+          {
+            "id": "network",
+            "color": "#8fd07e",
+            "name": "Progress/Network Events",
+            "short": "События, связанные с прогрессом и завершением сетевых запросов.",
+            "events": [
+              "loadstart",
+              "progress",
+              "load",
+              "loadend",
+              "error",
+              "abort",
+              "timeout"
+            ],
+            "desc": [
+              [
+                "loadstart",
+                "Происходит, когда сетевой запрос (например, XMLHttpRequest) начинает загрузку данных."
+              ],
+              [
+                "progress",
+                "Срабатывает периодически в процессе передачи данных, для отслеживания прогресса."
+              ],
+              [
+                "load",
+                "Происходит, когда запрос завершается успешно."
+              ],
+              [
+                "loadend",
+                "Происходит при завершении запроса, вне зависимости от успеха (после load, error, abort)."
+              ],
+              [
+                "error",
+                "Происходит, когда при запросе возникает ошибка (например, проблема с сетью)."
+              ],
+              [
+                "abort",
+                "Происходит, когда запрос прерван пользователем или кодом (методом abort())."
+              ],
+              [
+                "timeout",
+                "Происходит, когда запрос превысил допустимый лимит времени."
+              ]
+            ]
+          },
+          {
+            "id": "anim",
+            "color": "#ff9e5c",
+            "name": "Animation & Transition Events",
+            "short": "События, связанные с началом/концом CSS-анимаций и переходов.",
+            "events": [
+              "animationstart",
+              "animationend",
+              "animationiteration",
+              "animationcancel",
+              "transitionstart",
+              "transitionend",
+              "transitionrun",
+              "transitioncancel"
+            ],
+            "desc": [
+              [
+                "animationstart",
+                "Происходит в момент начала CSS-анимации."
+              ],
+              [
+                "animationend",
+                "Происходит при завершении CSS-анимации (в конце одного цикла итерации)."
+              ],
+              [
+                "animationiteration",
+                "Происходит, когда анимация повторяет свой цикл (при animation-iteration-count > 1)."
+              ],
+              [
+                "animationcancel",
+                "Происходит, когда анимация прерывается до завершения (например, удалён animation-name)."
+              ],
+              [
+                "transitionstart",
+                "Происходит в момент начала CSS-перехода."
+              ],
+              [
+                "transitionend",
+                "Происходит при завершении CSS-перехода."
+              ],
+              [
+                "transitionrun",
+                "Происходит, когда переход создан (включая его задержку; ещё не начался визуально)."
+              ],
+              [
+                "transitioncancel",
+                "Происходит, когда переход прерывается до завершения."
+              ]
+            ]
+          },
+          {
+            "id": "storage",
+            "color": "#9ad6a0",
+            "name": "Storage Events",
+            "short": "Событие, связанное с изменениями localStorage/sessionStorage.",
+            "events": [
+              "storage"
+            ],
+            "desc": [
+              [
+                "storage",
+                "Происходит, когда данные в localStorage (или sessionStorage) изменяются в другой вкладке/окне того же origin — в текущей вкладке, где происходит изменение, это событие не срабатывает."
+              ]
+            ]
+          },
+          {
+            "id": "selection",
+            "color": "#d0b0ff",
+            "name": "Selection Events",
+            "short": "События, связанные с выделением текста.",
+            "events": [
+              "selectstart",
+              "selectionchange"
+            ],
+            "desc": [
+              [
+                "selectstart",
+                "Происходит, когда пользователь начинает процесс выделения текста (момент начала выделения)."
+              ],
+              [
+                "selectionchange",
+                "Происходит при изменении диапазона выделенного текста (Selection) в документе."
+              ]
+            ]
+          },
+          {
+            "id": "sensor",
+            "color": "#8ad6c8",
+            "name": "Sensor/Device Events",
+            "short": "События, связанные с датчиками устройства (ориентация, движение).",
+            "events": [
+              "deviceorientation",
+              "devicemotion",
+              "orientationchange"
+            ],
+            "desc": [
+              [
+                "deviceorientation",
+                "Происходит при изменении физической ориентации устройства в пространстве (углы alpha, beta, gamma)."
+              ],
+              [
+                "devicemotion",
+                "Происходит при изменении ускорения (acceleration) и скорости вращения устройства."
+              ],
+              [
+                "orientationchange",
+                "Происходит при повороте устройства между режимами portrait/landscape."
+              ]
+            ]
+          },
+          {
+            "id": "fullscreen",
+            "color": "#ffd08a",
+            "name": "Fullscreen Events",
+            "short": "События, связанные с переходом в полноэкранный режим и выходом из него.",
+            "events": [
+              "fullscreenchange",
+              "fullscreenerror"
+            ],
+            "desc": [
+              [
+                "fullscreenchange",
+                "Происходит, когда элемент входит или выходит из полноэкранного режима."
+              ],
+              [
+                "fullscreenerror",
+                "Происходит, когда переход в полноэкранный режим не удался (например, из-за отсутствия разрешения)."
+              ]
+            ]
+          },
+          {
+            "id": "gamepad",
+            "color": "#ff9e9e",
+            "name": "Gamepad Events",
+            "short": "События, связанные с подключением/отключением геймпада.",
+            "events": [
+              "gamepadconnected",
+              "gamepaddisconnected"
+            ],
+            "desc": [
+              [
+                "gamepadconnected",
+                "Происходит, когда новый геймпад подключается к браузеру (после первого нажатия кнопки или движения джойстика)."
+              ],
+              [
+                "gamepaddisconnected",
+                "Происходит, когда подключённый геймпад отключается или становится недоступным."
+              ]
+            ]
+          },
+          {
+            "id": "websocket",
+            "color": "#9ac2ff",
+            "name": "WebSocket Events",
+            "short": "События, связанные со статусом WebSocket-соединения.",
+            "events": [
+              "open",
+              "message",
+              "close",
+              "error"
+            ],
+            "desc": [
+              [
+                "open",
+                "Происходит, когда WebSocket-соединение успешно установлено."
+              ],
+              [
+                "message",
+                "Происходит, когда данные получены от сервера через WebSocket."
+              ],
+              [
+                "close",
+                "Происходит, когда WebSocket-соединение закрыто (намеренно или из-за ошибки)."
+              ],
+              [
+                "error",
+                "Происходит, когда на WebSocket-соединении возникает ошибка."
+              ]
+            ]
+          },
+          {
+            "id": "sw",
+            "color": "#c0c8ff",
+            "name": "Service Worker / PWA Events",
+            "short": "События, связанные с жизненным циклом Service Worker и функциональностью PWA.",
+            "events": [
+              "install",
+              "activate",
+              "fetch",
+              "message",
+              "push",
+              "sync",
+              "beforeinstallprompt",
+              "appinstalled"
+            ],
+            "desc": [
+              [
+                "install",
+                "Происходит на этапе регистрации и установки Service Worker (для подготовки кэша)."
+              ],
+              [
+                "activate",
+                "Происходит, когда Service Worker активируется и берёт под контроль страницу (часто для очистки старых кэшей)."
+              ],
+              [
+                "fetch",
+                "Происходит, когда сетевой запрос со страницы проходит через Service Worker (с возможностью перехвата)."
+              ],
+              [
+                "message",
+                "Происходит, когда Service Worker получает сообщение от главного потока (через postMessage)."
+              ],
+              [
+                "push",
+                "Происходит, когда получено push-уведомление от сервера."
+              ],
+              [
+                "sync",
+                "Происходит через Background Sync API, когда соединение восстановлено и нужно выполнить отложенную задачу."
+              ],
+              [
+                "beforeinstallprompt",
+                "Происходит, когда браузер готовит запрос на установку PWA, до показа пользователю."
+              ],
+              [
+                "appinstalled",
+                "Происходит, когда PWA успешно установлено на устройстве пользователя."
+              ]
+            ]
+          },
+          {
+            "id": "error",
+            "color": "#ff9a8a",
+            "name": "Error/Security Events",
+            "short": "События, связанные с ошибками и нарушениями безопасности.",
+            "events": [
+              "error",
+              "securitypolicyviolation",
+              "rejectionhandled",
+              "unhandledrejection"
+            ],
+            "desc": [
+              [
+                "error",
+                "Происходит при ошибке выполнения JavaScript или при ошибке загрузки ресурса (изображение, скрипт)."
+              ],
+              [
+                "securitypolicyviolation",
+                "Происходит, когда контент нарушает правила Content Security Policy (CSP)."
+              ],
+              [
+                "rejectionhandled",
+                "Происходит, когда к ранее необработанному rejection Promise позже добавлен обработчик .catch()."
+              ],
+              [
+                "unhandledrejection",
+                "Происходит, когда rejection Promise остался необработанным (не добавлен ни один .catch())."
+              ]
+            ]
+          },
+          {
+            "id": "custom",
+            "color": "#a6d0ff",
+            "name": "Custom Events",
+            "short": "События, определяемые разработчиком и вызываемые через dispatchEvent.",
+            "events": [
+              "CustomEvent"
+            ],
+            "desc": [
+              [
+                "CustomEvent",
+                "Конструктор события, позволяющий разработчику создать собственное именованное событие (new CustomEvent('myEvent', { detail: {...} })) и передать дополнительные данные через свойство detail; затем оно отправляется через dispatchEvent() и прослушивается addEventListener()."
+              ]
+            ]
+          }
+        ],
+        "searchPlaceholder": "Поиск: событие, категория или описание... (Ctrl + K)",
+        "allCategories": "Все категории",
+        "copyTooltip": "Копировать",
+        "copiedTooltip": "Скопировано!",
+        "copySnippet": "Код",
+        "noResults": "События не найдены",
+        "noResultsSub": "Попробуйте другой поисковый запрос",
+        "totalEvents": "Всего {count} событий",
+        "filterNotice": "Найдено {count} событий",
+        "specTitle": "Спецификация и описание",
+        "eventCol": "Имя события",
+        "descCol": "Поведение и описание",
+        "actionsCol": "Действия",
+        "viewCode": "Просмотр",
+        "hideCode": "Скрыть",
+        "viewTooltip": "Посмотреть пример кода",
+        "codeExample": "Пример кода"
+      }
+    };
+
+    let currentLang = 'ka';
+    let activeCategory = 'all';
+    let searchQuery = '';
+    const openPreviews = new Set(); // tracks which events have preview open
+
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const searchWrapper = document.getElementById('searchWrapper');
+    const searchClear = document.getElementById('searchClear');
+    const langToggle = document.getElementById('langToggle');
+    const navList = document.getElementById('navList');
+    const mobileCatRail = document.getElementById('mobileCatRail');
+    const contentSections = document.getElementById('contentSections');
+    const pageHeading = document.getElementById('pageHeading');
+    const pageSubHeading = document.getElementById('pageSubHeading');
+    const totalCountPill = document.getElementById('totalCountPill');
+    const totalCatsPill = document.getElementById('totalCatsPill');
+    const sidebarSectionTitle = document.getElementById('sidebarSectionTitle');
+    const brandBtn = document.getElementById('brandBtn');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const toTopBtn = document.getElementById('toTopBtn');
+
+    // Helper to escape HTML and highlight search terms
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlightText(text, query) {
+      if (!query) return escapeHtml(text);
+      const escapedText = escapeHtml(text);
+      const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp('(' + safeQuery + ')', 'gi');
+      return escapedText.replace(regex, '<mark class="highlight">$1</mark>');
+    }
+
+    // Generate context-tailored code snippet
+    function generateSnippet(eventName, catId) {
+      if (catId === 'mouse') {
+        return `// Mouse Event: '${eventName}'
+const button = document.querySelector('#target-button');
+
+button.addEventListener('${eventName}', (event) => {
+  console.log('Event fired:', event.type);
+  console.log('Mouse coordinates:', event.clientX, event.clientY);
+  console.log('Button clicked:', event.button);
+});`;
+      } else if (catId === 'keyboard') {
+        return `// Keyboard Event: '${eventName}'
+window.addEventListener('${eventName}', (event) => {
+  console.log('Key pressed:', event.key);
+  console.log('Key code:', event.code);
+  if (event.key === 'Enter') {
+    console.log('User pressed Enter!');
+  }
+});`;
+      } else if (catId === 'form') {
+        if (eventName === 'submit') {
+          return `// Form Submit Event
+const form = document.querySelector('#myForm');
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // Prevent full page reload
+  const formData = new FormData(event.target);
+  console.log('Form data:', Object.fromEntries(formData));
+});`;
+        }
+        return `// Form Field Event: '${eventName}'
+const input = document.querySelector('#myInput');
+
+input.addEventListener('${eventName}', (event) => {
+  console.log('Current value:', event.target.value);
+});`;
+      } else if (catId === 'window') {
+        if (eventName === 'DOMContentLoaded') {
+          return `// Window/Document Event: DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM is fully constructed and elements are accessible.');
+});`;
+        }
+        return `// Window/Document Event: '${eventName}'
+window.addEventListener('${eventName}', (event) => {
+  console.log('${eventName} event fired:', event.type);
+});`;
+      } else if (catId === 'storage') {
+        return `// Storage Event (fires across other tabs/windows)
+window.addEventListener('storage', (event) => {
+  console.log('Changed key:', event.key);
+  console.log('Old value:', event.oldValue);
+  console.log('New value:', event.newValue);
+});`;
+      } else if (catId === 'custom') {
+        return `// Custom Event Example
+// 1. Dispatch custom event with detail payload
+const customEvent = new CustomEvent('myCustomEvent', {
+  detail: { userId: 42, role: 'admin' },
+  bubbles: true
+});
+document.dispatchEvent(customEvent);
+
+// 2. Listen to the custom event
+document.addEventListener('myCustomEvent', (event) => {
+  console.log('Received custom detail:', event.detail);
+});`;
+      } else if (catId === 'touch') {
+        return `// Touch Event: '${eventName}'
+const touchArea = document.querySelector('#touchArea');
+
+touchArea.addEventListener('${eventName}', (event) => {
+  if (event.touches.length > 0) {
+    const touch = event.touches[0];
+    console.log('Touch point:', touch.pageX, touch.pageY);
+  }
+}, { passive: true });`;
+      } else if (catId === 'pointer') {
+        return `// Pointer Event: '${eventName}'
+const canvas = document.querySelector('#canvas');
+
+canvas.addEventListener('${eventName}', (event) => {
+  console.log('Pointer type:', event.pointerType); // mouse, pen, or touch
+  console.log('Position:', event.clientX, event.clientY);
+});`;
+      } else {
+        return `// Event Listener: '${eventName}'
+const target = document.querySelector('#element');
+
+target.addEventListener('${eventName}', (event) => {
+  console.log('Event triggered:', event.type);
+  console.log('Target element:', event.target);
+});`;
+      }
+    }
+
+    // Simple syntax highlighter for snippet view
+    function highlightJs(code) {
+      const escaped = escapeHtml(code);
+      return escaped
+        .replace(/(\/\/[^\n]*)/g, '<span class="syn-com">$1</span>')
+        .replace(/\b(const|let|var|function|new|if|else|return|true|false)\b/g, (m) => {
+          if (m === 'true' || m === 'false') return '<span class="syn-bool">' + m + '</span>';
+          return '<span class="syn-kw">' + m + '</span>';
+        })
+        .replace(/\b(addEventListener|dispatchEvent|querySelector|preventDefault|fromEntries|log)\b/g, '<span class="syn-fn">$1</span>')
+        .replace(/(&apos;.*?&apos;|&#39;.*?&#39;|'.*?'|`.*?`)/g, '<span class="syn-str">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="syn-num">$1</span>');
+    }
+
+    // Copy to clipboard with toast notification
+    function copyText(text, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(label || DATA[currentLang].copiedTooltip);
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(label || DATA[currentLang].copiedTooltip);
+      });
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // Render Application
+    function render() {
+      const d = DATA[currentLang];
+      document.documentElement.lang = currentLang;
+      document.title = d.title + ' — Reference';
+
+      // Update static labels
+      searchInput.placeholder = d.searchPlaceholder;
+      sidebarSectionTitle.textContent = d.catLabel;
+
+      // Language buttons state
+      document.querySelectorAll('#langToggle .lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+
+      // Calculate total events
+      const totalEvents = d.items.reduce((acc, cat) => acc + cat.events.length, 0);
+      totalCountPill.textContent = d.totalEvents.replace('{count}', totalEvents);
+      totalCatsPill.textContent = d.items.length + ' ' + (currentLang === 'ka' ? 'კატეგორია' : currentLang === 'ru' ? 'категорий' : 'Categories');
+
+      // Build Sidebar Nav
+      buildSidebarNav(d, totalEvents);
+      buildMobileRail(d, totalEvents);
+
+      // Render Content Sections
+      renderContent(d);
+    }
+
+    function buildSidebarNav(d, totalEvents) {
+      navList.innerHTML = '';
+
+      // "All Categories" Item
+      const allLi = document.createElement('li');
+      allLi.innerHTML = `
+    <button type="button" class="nav-item-btn ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
+      <div class="nav-label-group">
+        <span class="cat-indicator" style="background: var(--accent)"></span>
+        <span>${escapeHtml(d.allCategories)}</span>
+      </div>
+      <span class="nav-counter">${totalEvents}</span>
+    </button>
+  `;
+      navList.appendChild(allLi);
+
+      // Category Items
+      d.items.forEach(cat => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+      <button type="button" class="nav-item-btn ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}" style="--item-color: ${cat.color}">
+        <div class="nav-label-group">
+          <span class="cat-indicator"></span>
+          <span>${escapeHtml(cat.name)}</span>
+        </div>
+        <span class="nav-counter">${cat.events.length}</span>
+      </button>
+    `;
+        navList.appendChild(li);
+      });
+    }
+
+    function buildMobileRail(d, totalEvents) {
+      mobileCatRail.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = 'mobile-chip ' + (activeCategory === 'all' ? 'active' : '');
+      allBtn.dataset.cat = 'all';
+      allBtn.textContent = d.allCategories + ' (' + totalEvents + ')';
+      mobileCatRail.appendChild(allBtn);
+
+      d.items.forEach(cat => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mobile-chip ' + (activeCategory === cat.id ? 'active' : '');
+        b.dataset.cat = cat.id;
+        b.textContent = cat.name + ' (' + cat.events.length + ')';
+        mobileCatRail.appendChild(b);
+      });
+    }
+
+    function renderContent(d) {
+      contentSections.innerHTML = '';
+      const q = searchQuery.trim().toLowerCase();
+
+      let categoriesToShow = d.items;
+      if (activeCategory !== 'all') {
+        categoriesToShow = d.items.filter(cat => cat.id === activeCategory);
+      }
+
+      let totalMatches = 0;
+
+      categoriesToShow.forEach(cat => {
+        // Filter events by query
+        const matchingDesc = cat.desc.filter(([name, desc]) => {
+          if (!q) return true;
+          return name.toLowerCase().includes(q) ||
+            desc.toLowerCase().includes(q) ||
+            cat.name.toLowerCase().includes(q);
+        });
+
+        if (matchingDesc.length === 0 && q) {
+          return;
+        }
+
+        totalMatches += matchingDesc.length;
+
+        const section = document.createElement('section');
+        section.className = 'category-section';
+        section.id = 'sec-' + cat.id;
+        section.style.setProperty('--cat-color', cat.color);
+
+        // Category Header
+        const headerHtml = `
+      <div class="category-header">
+        <div class="category-title-row">
+          <h2 class="category-title">${escapeHtml(cat.name)}</h2>
+          <span class="category-count-badge">${matchingDesc.length} ${d.countLabel}</span>
+        </div>
+        <p class="category-desc">${escapeHtml(cat.short)}</p>
+      </div>
+    `;
+
+        // Table Header & Rows
+        let rowsHtml = '';
+        matchingDesc.forEach(([eventName, descText]) => {
+          const isDeprecated = eventName.includes('deprecated');
+          const cleanName = eventName.replace(/\s*\(deprecated\)/, '').trim();
+          const snippet = generateSnippet(cleanName, cat.id);
+          const isOpen = openPreviews.has(cleanName);
+
+          rowsHtml += `
+        <div class="event-item ${isOpen ? 'preview-open' : ''}" id="item-${escapeHtml(cleanName)}">
+          <div class="event-row">
+            <div class="event-name-cell">
+              <code class="event-code">${highlightText(cleanName, q)}</code>
+              ${isDeprecated ? '<span class="badge-deprecated">deprecated</span>' : ''}
+            </div>
+            <div class="event-desc-cell">
+              ${highlightText(descText, q)}
+            </div>
+            <div class="event-actions-cell">
+              <!-- 1. Copy Event Name -->
+
+              
+
+
+              <!-- 2. View/Toggle Code Drawer (</> Code Icon) -->
+              <button type="button" class="action-icon-btn view-code-btn ${isOpen ? 'active' : ''}" data-event="${escapeHtml(cleanName)}" title="${escapeHtml(d.codeExample)}: ${escapeHtml(cleanName)}" aria-label="${escapeHtml(d.codeExample)}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="7 8 3 12 7 16"></polyline>
+                  <polyline points="17 8 21 12 17 16"></polyline>
+                  <line x1="14" y1="4" x2="10" y2="20"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expandable Code Snippet Drawer -->
+          <div class="event-snippet-drawer">
+            <div class="snippet-drawer-header">
+              <div class="snippet-drawer-info">
+                <span class="snippet-lang-tag">JavaScript</span>
+                <span class="snippet-desc">${d.codeExample}: <code>${escapeHtml(cleanName)}</code></span>
+              </div>
+              <div class="snippet-drawer-actions">
+                <button type="button" class="action-icon-btn copy-code-btn" data-snippet="${escapeHtml(snippet)}" title="${escapeHtml(d.copySnippet)}" aria-label="${escapeHtml(d.copySnippet)}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                <button type="button" class="action-icon-btn close-drawer-btn" data-event="${escapeHtml(cleanName)}" title="Close" aria-label="Close">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <pre class="snippet-pre"><code>${highlightJs(snippet)}</code></pre>
+          </div>
+        </div>
+      `;
+        });
+
+        const tableHtml = `
+      <div class="spec-table">
+        <div class="spec-table-header">
+          <div>${d.eventCol}</div>
+          <div>${d.descCol}</div>
+          <div style="text-align: right">${d.actionsCol}</div>
+        </div>
+        <div class="spec-table-body">
+          ${rowsHtml}
+        </div>
+      </div>
+    `;
+
+        section.innerHTML = headerHtml + tableHtml;
+        contentSections.appendChild(section);
+      });
+
+      // If no events matched search
+      if (totalMatches === 0 && q) {
+        contentSections.innerHTML = `
+      <div class="no-results-box">
+        <h3 class="no-results-title">${d.noResults}</h3>
+        <p class="no-results-sub">${d.noResultsSub} ("${escapeHtml(searchQuery)}")</p>
+      </div>
+    `;
+      }
+
+      // Update Stats header
+      if (q) {
+        pageHeading.textContent = d.filterNotice.replace('{count}', totalMatches);
+        pageSubHeading.textContent = (currentLang === 'ka' ? 'საძიებო ფილტრი: ' : currentLang === 'ru' ? 'Поиск: ' : 'Search query: ') + '"' + searchQuery + '"';
+      } else if (activeCategory !== 'all') {
+        const selectedCat = d.items.find(c => c.id === activeCategory);
+        if (selectedCat) {
+          pageHeading.textContent = selectedCat.name;
+          pageSubHeading.textContent = selectedCat.short;
+        }
+      } else {
+        pageHeading.textContent = d.tagline;
+        pageSubHeading.textContent = currentLang === 'ka'
+          ? 'JavaScript მოვლენების სრული ტექნიკური სპეციფიკაცია და დოკუმენტაცია'
+          : currentLang === 'ru'
+            ? 'Полная техническая спецификация и документация событий JavaScript'
+            : 'Comprehensive technical specification and reference guide for JavaScript DOM events';
+      }
+    }
+
+    // Category Navigation Listener
+    function selectCategory(catId) {
+      activeCategory = catId;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cat]');
+      if (!btn) return;
+      selectCategory(btn.dataset.cat);
+    });
+
+    mobileCatRail.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cat]');
+      if (!btn) return;
+      selectCategory(btn.dataset.cat);
+    });
+
+    // Brand click -> reset
+    brandBtn.addEventListener('click', () => {
+      searchQuery = '';
+      searchInput.value = '';
+      searchWrapper.classList.remove('has-val');
+      activeCategory = 'all';
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Search input handling
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      searchWrapper.classList.toggle('has-val', searchQuery.length > 0);
+      render();
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchQuery = '';
+      searchInput.value = '';
+      searchWrapper.classList.remove('has-val');
+      render();
+      searchInput.focus();
+    });
+
+    // Keyboard shortcut (Ctrl/Cmd + K or / to search)
+    window.addEventListener('keydown', (e) => {
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && document.activeElement !== searchInput)) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.blur();
+        if (searchQuery) {
+          searchQuery = '';
+          searchInput.value = '';
+          searchWrapper.classList.remove('has-val');
+          render();
+        }
+      }
+    });
+
+    // Language Switcher
+    langToggle.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-lang]');
+      if (!btn) return;
+      currentLang = btn.dataset.lang;
+      render();
+    });
+
+    // Unified Action Delegator
+    contentSections.addEventListener('click', (e) => {
+      // 1. Copy event name (Clipboard icon)
+      const copyNameBtn = e.target.closest('.copy-name-btn');
+      if (copyNameBtn) {
+        const val = copyNameBtn.getAttribute('data-copy');
+        copyText(val, (currentLang === 'ka' ? 'დაკოპირდა: ' : currentLang === 'ru' ? 'Скопировано: ' : 'Copied: ') + val);
+        copyNameBtn.classList.add('copied');
+        setTimeout(() => copyNameBtn.classList.remove('copied'), 1200);
+        return;
+      }
+
+      // 2. View/Toggle Code (Eye Icon)
+      const viewCodeBtn = e.target.closest('.view-code-btn');
+      if (viewCodeBtn) {
+        const evName = viewCodeBtn.getAttribute('data-event');
+        const itemEl = viewCodeBtn.closest('.event-item');
+        if (!itemEl) return;
+
+        if (openPreviews.has(evName)) {
+          openPreviews.delete(evName);
+          itemEl.classList.remove('preview-open');
+          viewCodeBtn.classList.remove('active');
+        } else {
+          openPreviews.add(evName);
+          itemEl.classList.add('preview-open');
+          viewCodeBtn.classList.add('active');
+        }
+        return;
+      }
+
+      // 3. Close Drawer Button inside drawer
+      const closeDrawerBtn = e.target.closest('.close-drawer-btn');
+      if (closeDrawerBtn) {
+        const evName = closeDrawerBtn.getAttribute('data-event');
+        const itemEl = closeDrawerBtn.closest('.event-item');
+        if (itemEl) {
+          openPreviews.delete(evName);
+          itemEl.classList.remove('preview-open');
+          const viewBtn = itemEl.querySelector('.view-code-btn');
+          if (viewBtn) {
+            viewBtn.classList.remove('active');
+          }
+        }
+        return;
+      }
+
+      // 4. Copy Code Snippet (Code Icon)
+      const copyCodeBtn = e.target.closest('.copy-code-btn');
+      if (copyCodeBtn) {
+        const val = copyCodeBtn.getAttribute('data-snippet');
+        copyText(val, DATA[currentLang].copiedTooltip);
+        copyCodeBtn.classList.add('copied');
+        setTimeout(() => copyCodeBtn.classList.remove('copied'), 1200);
+      }
+    });
+
+    // Scroll to top
+    window.addEventListener('scroll', () => {
+      toTopBtn.classList.toggle('show', window.scrollY > 400);
+    }, { passive: true });
+
+    toTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Initial Render
+    render();
+  </script>
+</body>
+
+</html>

@@ -55,6 +55,14 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
   }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
 
   .grid.grid-2 {
     grid-template-columns: repeat(2, 1fr);
@@ -164,26 +172,27 @@
 <body>
 
 <div class="card" id="card">
-  <h1 class="headline">Docker commands part 1</h1>
+  <h1 class="headline">Necessary  Docker Commands after first run</h1>
 
+  <br>
   <!-- 1. Verification & Info (3 commands) -->
   <div class="section-title">1. Existing Dockerization Verification & Info</div>
   <div class="grid" id="verificationGrid"></div>
 
   <!-- 2. State Check (4 commands) -->
   <div class="section-title">2. Existing State Check</div>
-  <div class="grid" id="stateGrid"></div>
+  <div class="grid-2" id="stateGrid"></div>
 
   <!-- 3. Testing (5 commands) -->
   <div class="section-title">3. Testing</div>
-  <div class="grid" id="testingGrid"></div>
+  <div class="grid-3" id="testingGrid"></div>
 
-  <!-- 4. Multi-container Orchestration (6 commands) -->
+  <!-- 4. Multi-container Orchestration (6 commands)
   <div class="section-title">4. Multi-container Orchestration/Management</div>
-  <div class="grid" id="composeGrid"></div>
+  <div class="grid" id="composeGrid"></div> -->
 
+  <br>
   <div class="footer">
-    <span class="vs-badge">⚡ Docker — containerize your apps in seconds</span>
     <p class="footer-note">🔵 Blue colored names are custom — replace them with your project names</p>
   </div>
 
@@ -210,8 +219,8 @@
   const testing = [
     "docker pull hello-world",
     "docker run -d -p 80:80 hello-world",
-    "docker stop my-web",
-    "docker rm my-web",
+    "docker stop hello-world",
+    "docker rm hello-world",
     "docker rmi hello-world"
   ];
 
@@ -240,8 +249,8 @@
     // 3. Testing
     "docker pull hello-world": "Download an image from Docker Hub to your local machine. Hello World is the simplest image for testing.",
     "docker run -d -p 80:80 hello-world": "Run a container in detached mode, mapping port 80. Hello World easily verifies Docker is working.",
-    "docker stop my-web": "Sends SIGTERM signal, waits 10 seconds, then SIGKILL. Gracefully stops processes inside the container.",
-    "docker rm my-web": "Remove container metadata and writable layer. Use -f flag to force remove a running container.",
+    "docker stop hello-world": "Sends SIGTERM signal, waits 10 seconds, then SIGKILL. Gracefully stops processes inside the container.",
+    "docker rm hello-world": "Remove container metadata and writable layer. Use -f flag to force remove a running container.",
     "docker rmi hello-world": "Remove an image and free disk space. First stop all containers using this image, or use -f to force remove.",
 
     // 4. Multi-container Orchestration/Management
@@ -263,7 +272,7 @@
   function createHook(name, grid) {
     const div = document.createElement("div");
     div.className = "hook";
-    div.innerHTML = name.replace(/my-web|my-app|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
+    div.innerHTML = name.replace(/hello-world|my-app|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
 
     div.addEventListener("mouseenter", () => {
       document.querySelectorAll(".grid").forEach(g => g.classList.add("hook-active"));

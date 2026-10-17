@@ -2,7 +2,7 @@
 <html lang="ka">
 <head>
 <meta charset="UTF-8">
-<title>Necessary Docker Commands</title>
+<title>დოკერის ბრძანებები პირველი გაშვებისას მაწილი 1</title>
 <style>
   body {
     margin: 0;
@@ -55,10 +55,19 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
   }
-
-  .grid.grid-2 {
-    grid-template-columns: repeat(2, 1fr);
+   .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
   }
+   .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+
+  /* .grid.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  } */
 
   .hook {
     padding: 28px 18px;
@@ -149,7 +158,7 @@
   }
 
   .custom {
-    color: #336ef0;
+    color: #1c5ce6;
     font-weight: 700;
   }
 
@@ -164,27 +173,30 @@
 <body>
 
 <div class="card" id="card">
-  <h1 class="headline">დოკერის ბრძანებები მაწილი 1</h1>
+  <h1 class="headline">დოკერის ბრძანებები პირველი გაშვებისას მაწილი 1</h1>
 
   <br>
   <!-- 1. შემოწმება და ინფორმაცია (3 კამანდა) -->
   <div class="section-title">1. არსებული დოკერიზაციის შემოწმება და ინფორმაცია</div>
+  <br>
   <div class="grid" id="verificationGrid"></div>
 
   <!-- 2. მდგომარეობის შემოწმება (4 კამანდა) -->
   <div class="section-title">2. არსებული მდგომარეობის შემოწმება</div>
-  <div class="grid" id="stateGrid"></div>
+  <br>
+  <div class="grid-2" id="stateGrid"></div>
 
   <!-- 3. სატესტო (5 კამანდა) -->
   <div class="section-title">3. სატესტო</div>
-  <div class="grid" id="testingGrid"></div>
+  <br>
+  <div class="grid-3" id="testingGrid"></div>
 
   <!-- 4. მულტი კონტეინერების ორკესტრაცია (6 კამანდა) -->
-  <div class="section-title">4. მულტი კონტეინერების ორკესტრაცია/მართვა</div>
-  <div class="grid" id="composeGrid"></div>
+  <!-- <div class="section-title">4. მულტი კონტეინერების ორკესტრაცია/მართვა</div>
+  <div class="grid" id="composeGrid"></div> -->
 
+  <br>
   <div class="footer">
-    <span class="vs-badge">⚡ Docker — აპლიკაციების კონტეინერიზაცია წამებში</span>
     <p class="footer-note">🔵 ლურჯი ფერით მოცემული სახელები არის custom და შეცვალეთ თქვენი პროექტის სახელებით</p>
   </div>
 
@@ -211,8 +223,8 @@
   const testing = [
     "docker pull hello-world",
     "docker run -d -p 80:80 hello-world",
-    "docker stop my-web",
-    "docker rm my-web",
+    "docker stop hello-world",
+    "docker rm hello-world",
     "docker rmi hello-world"
   ];
 
@@ -241,8 +253,8 @@
     // 3. სატესტო
     "docker pull hello-world": "Image-ის ჩამოტვირთვა Docker Hub-დან თქვენს ლოკალურ მანქანაზე. Hello World ყველაზე მარტივი Image-ია ტესტირებისთვის.",
     "docker run -d -p 80:80 hello-world": "Container-ის გაშვება detached რეჟიმში, პორტ 80-ის მიბმით. Hello World მარტივად ამოწმებს გაშვებას.",
-    "docker stop my-web": "აგზავნის SIGTERM სიგნალს, 10 წამი ელოდება, მერე SIGKILL-ს. ნაზად აჩერებს პროცესებს.",
-    "docker rm my-web": "შლის Container-ის metadata-ს და writable layer-ს. -f ფლაგით ძალით შლის მიმდინარესაც.",
+    "docker stop hello-world": "აგზავნის SIGTERM სიგნალს, 10 წამი ელოდება, მერე SIGKILL-ს. ნაზად აჩერებს პროცესებს.",
+    "docker rm hello-world": "შლის Container-ის metadata-ს და writable layer-ს. -f ფლაგით ძალით შლის მიმდინარესაც.",
     "docker rmi hello-world": "შლის Image-ს და ათავისუფლებს დისკის სივრცეს. ჯერ უნდა გააჩეროთ ყველა Container-ი ამ Image-ით.",
 
     // 4. მულტი კონტეინერების ორკესტრაცია/მართვა
@@ -264,7 +276,7 @@
   function createHook(name, grid) {
     const div = document.createElement("div");
     div.className = "hook";
-    div.innerHTML = name.replace(/my-web|my-app|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
+    div.innerHTML = name.replace(/hello-world|<volume_name>/g, (match) => `<span class="custom">${match}</span>`);
 
     div.addEventListener("mouseenter", () => {
       document.querySelectorAll(".grid").forEach(g => g.classList.add("hook-active"));

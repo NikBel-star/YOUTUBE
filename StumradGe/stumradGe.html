@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stumrad.ge — Fundraising &amp; Storytelling</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #fff8ed;
+    --cream-dark: #f2eadb;
+    --ink: #142024;
+    --ink-soft: #4d5a5c;
+    --terracotta: #e5572f;
+    --terracotta-soft: #ff8159;
+    --deep: #12606a;
+    --deep-light: #1f8390;
+    --gold: #f1b84b;
+    --line: #e6d8c1;
+    --sky: #39a7d7;
+    --leaf: #78b66d;
+  }
+
+  html, body {
+    height: 100%;
+    background: #10252a;
+    font-family: 'Noto Sans Georgian', 'BPG Nino Mtavruli', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    background: var(--cream);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.98);
+    transition: opacity .55s ease, transform .55s ease, visibility .55s;
+    display: flex;
+    flex-direction: column;
+    padding: 4.5vh 5vw 3vh;
+    overflow: hidden;
+  }
+
+  .slide.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); z-index: 2; }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -15%;
+    width: 55vw; height: 55vw;
+    background: radial-gradient(circle, rgba(57,167,215,0.16) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== IMAGE FRAME + FALLBACK ===== */
+  .img-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #12606a 0%, #39a7d7 48%, #f1b84b 100%);
+    box-shadow: 0 18px 40px -18px rgba(18,96,106,0.34), 0 0 0 1px rgba(18,96,106,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+  }
+  .img-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 1.2s cubic-bezier(.2,.8,.2,1), opacity .6s;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+  }
+  .img-frame img.loaded { opacity: 1; }
+  .slide.active .img-frame img.loaded { transform: scale(1.04); }
+
+  .img-frame::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,248,237,0.02) 0%, rgba(241,184,75,0.08) 55%, rgba(18,96,106,0.08) 100%);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity .6s;
+  }
+  .img-frame.has-image::after { opacity: 1; }
+
+  .img-frame .fallback {
+    position: relative;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+    color: rgba(247,243,236,0.92);
+    font-family: Georgia, serif;
+    font-size: clamp(11px, .9vw, 13.5px);
+    line-height: 1.4;
+    letter-spacing: .02em;
+  }
+  .img-frame .fallback::before {
+    content: '';
+    width: clamp(52px, 6vw, 86px);
+    height: clamp(34px, 4vw, 54px);
+    border-radius: 8px;
+    background:
+      linear-gradient(145deg, transparent 48%, rgba(255,255,255,0.34) 49% 52%, transparent 53%),
+      radial-gradient(circle at 72% 30%, rgba(241,184,75,0.95) 0 14%, transparent 15%),
+      linear-gradient(135deg, rgba(255,255,255,0.38) 0 20%, transparent 21%),
+      linear-gradient(135deg, rgba(18,96,106,0.82), rgba(57,167,215,0.68) 46%, rgba(120,182,109,0.7));
+    box-shadow: 0 8px 18px rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.22);
+  }
+  .img-frame.has-error .fallback { opacity: 1; }
+  .img-frame.has-image .fallback { opacity: 0; transition: opacity .4s; }
+
+  /* ===== HEADER ===== */
+  .kicker {
+    display: flex; align-items: center; gap: 14px;
+    font-size: clamp(11px, 1vw, 14px);
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    font-weight: 600;
+    margin-bottom: 2vh;
+    position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+  .kicker .num { font-family: Georgia, serif; font-size: 1.5em; letter-spacing: 0; color: var(--deep); opacity: .5; font-weight: 400; }
+  .kicker .bar { flex: 1; height: 1px; background: linear-gradient(90deg, var(--line) 0%, transparent 100%); max-width: 220px; }
+
+  /* ===== CONTENT ===== */
+  .content { flex: 1; display: grid; grid-template-columns: 1fr; gap: 3vh; position: relative; z-index: 1; min-height: 0; }
+  .content.two-col { grid-template-columns: 1.05fr 1fr; gap: 4vw; align-items: stretch; }
+  .content.two-col.reverse { grid-template-columns: 1fr 1.05fr; }
+
+  h1.title {
+    font-family: Georgia, 'Noto Serif Georgian', serif;
+    font-size: clamp(28px, 4.6vw, 74px);
+    line-height: 1.08; font-weight: 700;
+    color: var(--deep); letter-spacing: -0.015em;
+    margin-bottom: 3vh;
+  }
+  h1.title em { font-style: normal; color: var(--terracotta); position: relative; }
+  h1.title em::after {
+    content: ''; position: absolute;
+    left: 0; right: 0; bottom: 0.06em;
+    height: .32em;
+    background: rgba(198,154,78,0.28);
+    z-index: -1; border-radius: 2px;
+  }
+
+  h2.subtitle {
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 2.3vw, 32px);
+    line-height: 1.25; font-weight: 700;
+    color: var(--deep); margin-bottom: 2.2vh;
+  }
+
+  p.body-text { font-size: clamp(14px, 1.2vw, 18px); line-height: 1.75; color: var(--ink-soft); max-width: 62ch; }
+  p.body-text + p.body-text { margin-top: 1.2em; }
+
+  .quote-block { border-left: 4px solid var(--terracotta); padding: 1.2vh 0 1.2vh 1.8vw; margin: 2vh 0; }
+  .quote-block p { font-family: Georgia, serif; font-size: clamp(18px, 1.9vw, 28px); line-height: 1.35; font-style: italic; color: var(--deep); }
+
+  /* ===== CARDS ===== */
+  .cards { display: grid; gap: 1.6vh; align-content: stretch; }
+  .cards.c2 { grid-template-columns: 1fr 1fr; }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: #fffdf8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 2.2vh 1.4vw;
+    position: relative; overflow: hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+    box-shadow: 0 1px 3px rgba(18,96,106,0.05);
+    display: flex; flex-direction: column;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--terracotta), var(--gold), var(--sky));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .5s ease;
+    z-index: 3;
+  }
+  .slide.active .card::before { transform: scaleX(1); }
+  .slide.active .card:nth-child(1)::before { transition-delay: .2s; }
+  .slide.active .card:nth-child(2)::before { transition-delay: .3s; }
+  .slide.active .card:nth-child(3)::before { transition-delay: .4s; }
+  .slide.active .card:nth-child(4)::before { transition-delay: .5s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(18,96,106,0.12); }
+
+  .card .c-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--terracotta), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-family: Georgia, serif; font-weight: 700; font-size: 15px;
+    margin-bottom: 1.2vh; flex-shrink: 0;
+  }
+  .card h3 { font-family: Georgia, serif; font-size: clamp(14px, 1.25vw, 18px); color: var(--deep); margin-bottom: .6vh; line-height: 1.3; }
+  .card p { font-size: clamp(12px, .98vw, 14.5px); line-height: 1.6; color: var(--ink-soft); }
+
+  .card.img-card { padding: 0; overflow: hidden; }
+  .card.img-card .img-frame { border-radius: 0; height: clamp(110px, 16vh, 160px); box-shadow: none; }
+  .card.img-card .card-body { padding: 1.6vh 1.2vw 2vh; display: flex; flex-direction: column; flex: 1; }
+
+  /* ===== STATS ===== */
+  .stats { display: flex; gap: 2.8vw; flex-wrap: wrap; margin: 1.5vh 0; }
+  .stat { position: relative; padding-left: 1.4vw; }
+  .stat::before { content: ''; position: absolute; left: 0; top: .3em; bottom: .3em; width: 3px; background: var(--gold); border-radius: 2px; }
+  .stat .value { font-family: Georgia, serif; font-size: clamp(30px, 3.8vw, 56px); font-weight: 700; line-height: 1; color: var(--terracotta); letter-spacing: -0.02em; }
+  .stat .value span { font-size: .45em; }
+  .stat .label { font-size: clamp(11px, .95vw, 13.5px); color: var(--ink-soft); margin-top: .7vh; line-height: 1.45; max-width: 24ch; }
+
+  /* ===== LIST ===== */
+  ul.fancy { list-style: none; display: flex; flex-direction: column; gap: 1.2vh; }
+  ul.fancy li { position: relative; padding-left: 2.2vw; font-size: clamp(14px, 1.2vw, 17.5px); line-height: 1.55; color: var(--ink-soft); }
+  ul.fancy li::before { content: ''; position: absolute; left: 0; top: .58em; width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); }
+  ul.fancy li strong { color: var(--deep); font-weight: 600; }
+
+  /* ===== STEPS ===== */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: grid; grid-template-columns: 40px 1fr; gap: 1.2vw; padding: 1.4vh 0; border-bottom: 1px dashed var(--line); }
+  .step:last-child { border-bottom: none; }
+  .step .dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--deep); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, serif; font-weight: 700; font-size: 13px;
+  }
+  .step h4 { font-family: Georgia, serif; color: var(--deep); font-size: clamp(14px, 1.25vw, 17px); margin-bottom: .3vh; }
+  .step p { font-size: clamp(12px, .95vw, 14px); color: var(--ink-soft); line-height: 1.5; }
+
+  /* ===== IMAGE SIDE ===== */
+  .img-side { height: 100%; min-height: 320px; position: relative; }
+  .img-side .img-frame { height: 100%; width: 100%; }
+  .img-side .caption {
+    position: absolute; bottom: -1.5vh;
+    left: 0; right: 0;
+    font-size: clamp(10px, .82vw, 12px);
+    color: #9b8f7c; font-style: italic;
+    letter-spacing: .05em; text-align: right; padding-right: 4px;
+  }
+
+  /* ===== HERO BG ===== */
+  .slide.hero-bg { padding: 0; }
+  .slide.hero-bg .bg-img { position: absolute; inset: 0; z-index: 0; background: linear-gradient(135deg, #12606a, #39a7d7); }
+  .slide.hero-bg .bg-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; opacity: 0; transition: opacity .8s; }
+  .slide.hero-bg .bg-img img.loaded { opacity: 1; }
+  .slide.hero-bg .bg-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(115deg, rgba(13,54,61,0.86) 0%, rgba(13,54,61,0.68) 43%, rgba(13,54,61,0.26) 100%);
+    z-index: 2;
+  }
+  .slide.hero-bg .content,
+  .slide.hero-bg .kicker,
+  .slide.hero-bg .slide-footer { position: relative; z-index: 2; }
+  .slide.hero-bg { padding: 4.5vh 5vw 3vh; }
+  .slide.hero-bg .kicker { color: var(--gold); }
+  .slide.hero-bg .kicker .num { color: rgba(247,243,236,0.5); }
+  .slide.hero-bg .kicker .bar { background: linear-gradient(90deg, rgba(247,243,236,0.25), transparent); }
+  .slide.hero-bg h2.subtitle { color: #f7f3ec; }
+  .slide.hero-bg p.body-text { color: rgba(247,243,236,0.78); }
+  .slide.hero-bg .slide-footer { border-top-color: rgba(247,243,236,0.15); color: rgba(247,243,236,0.5); }
+  .slide.hero-bg .slide-footer .brand { color: #f7f3ec; }
+  .slide.hero-bg .card { background: rgba(247,243,236,0.96); backdrop-filter: blur(10px); border-color: rgba(247,243,236,0.3); }
+  .slide.hero-bg .stat .label { color: rgba(247,243,236,0.75); }
+
+  /* ===== COMPARE ===== */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; flex: 1; min-height: 0; }
+  .compare-item { display: flex; flex-direction: column; gap: 1.5vh; min-height: 0; }
+  .compare-item .img-frame { flex: 1; min-height: 180px; }
+  .compare-item .compare-text { flex-shrink: 0; }
+  .compare-item .compare-text h3 {
+    font-family: Georgia, serif;
+    font-size: clamp(14px, 1.35vw, 19px);
+    color: var(--deep); margin-bottom: .5vh;
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+  }
+  .compare-item .compare-text h3 .tag {
+    font-family: inherit; font-size: 11px; letter-spacing: .15em;
+    padding: 3px 8px; border-radius: 4px;
+    background: var(--cream-dark); color: var(--ink-soft); font-weight: 500;
+  }
+  .compare-item .compare-text h3 .tag.bad { background: rgba(181,69,31,0.12); color: var(--terracotta); }
+  .compare-item .compare-text p { font-size: clamp(12px, 1vw, 14.5px); line-height: 1.6; color: var(--ink-soft); }
+
+  /* ===== FOOTER ===== */
+  .slide-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: clamp(10px, .82vw, 12px);
+    color: #9b8f7c; letter-spacing: .08em;
+    padding-top: 1.8vh;
+    border-top: 1px solid var(--line);
+    margin-top: auto; position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+  .slide-footer .brand { font-family: Georgia, serif; font-weight: 700; color: var(--deep); letter-spacing: .02em; }
+  .slide-footer .brand span { color: var(--terracotta); }
+
+  /* ===== COVER ===== */
+  .slide.cover {
+    background: linear-gradient(150deg, #0d363d 0%, #12606a 58%, #39a7d7 100%);
+    justify-content: center; align-items: flex-start;
+    padding: 0 8vw;
+  }
+  .slide.cover::before {
+    background: radial-gradient(circle, rgba(241,184,75,0.24) 0%, transparent 60%);
+    top: auto; bottom: -25%; right: -10%;
+    width: 65vw; height: 65vw;
+  }
+  .slide.cover .content { display: flex; flex-direction: column; justify-content: center; grid-template-columns: 1fr; }
+  .slide.cover .cover-bg {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .slide.cover .cover-bg img {
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 0; transition: opacity .8s;
+  }
+  .slide.cover .cover-bg img.loaded { opacity: 1; }
+  .slide.cover .cover-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(105deg, rgba(13,54,61,0.94) 0%, rgba(13,54,61,0.74) 48%, rgba(13,54,61,0.28) 100%);
+  }
+  .slide.cover .content { position: relative; z-index: 2; }
+  .slide.cover .eyebrow {
+    color: var(--gold); font-size: clamp(11px, 1.05vw, 14px);
+    letter-spacing: .42em; text-transform: uppercase; font-weight: 600;
+    margin-bottom: 3vh; display: flex; align-items: center; gap: 16px;
+  }
+  .slide.cover .eyebrow::before { content: ''; width: 46px; height: 2px; background: var(--gold); }
+  .slide.cover h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(34px, 5.8vw, 88px);
+    line-height: 1.02; font-weight: 700;
+    color: #f7f3ec; letter-spacing: -0.02em;
+    max-width: 16ch; margin-bottom: 3.5vh;
+  }
+  .slide.cover h1 span { color: var(--gold); }
+  .slide.cover .lede {
+    font-size: clamp(15px, 1.45vw, 21px); line-height: 1.6;
+    color: rgba(247,243,236,0.72);
+    max-width: 46ch; margin-bottom: 4vh;
+    font-family: Georgia, serif; font-style: italic;
+  }
+  .slide.cover .meta {
+    display: flex; gap: 2.5vw; flex-wrap: wrap;
+    font-size: clamp(11px, .92vw, 13.5px);
+    color: rgba(247,243,236,0.5);
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .slide.cover .meta b { color: var(--gold); font-weight: 600; }
+
+  /* ===== CLOSING ===== */
+  .slide.closing { padding: 0; }
+  .slide.closing .bg-img { position: absolute; inset: 0; z-index: 0; background: linear-gradient(150deg, #12606a, #0d363d); }
+  .slide.closing .bg-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; opacity: 0; transition: opacity .8s; }
+  .slide.closing .bg-img img.loaded { opacity: 1; }
+  .slide.closing .bg-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(150deg, rgba(13,54,61,0.88) 0%, rgba(13,54,61,0.72) 58%, rgba(18,96,106,0.68) 100%);
+    z-index: 2;
+  }
+  .slide.closing { padding: 4.5vh 5vw 3vh; }
+  .slide.closing .content,
+  .slide.closing .kicker,
+  .slide.closing .slide-footer { position: relative; z-index: 2; }
+  .slide.closing .content { justify-content: center; }
+  .slide.closing h1.title { color: #f7f3ec; font-size: clamp(28px, 3.9vw, 56px); max-width: 20ch; }
+  .slide.closing h1.title em { color: var(--gold); }
+  .slide.closing h1.title em::after { background: rgba(198,154,78,0.25); }
+  .slide.closing p.body-text { color: rgba(247,243,236,0.75); }
+  .slide.closing .kicker { color: var(--gold); }
+  .slide.closing .kicker .num { color: rgba(247,243,236,0.5); }
+  .slide.closing .kicker .bar { background: linear-gradient(90deg, rgba(247,243,236,0.2), transparent); }
+  .slide.closing .slide-footer { border-top-color: rgba(247,243,236,0.15); color: rgba(247,243,236,0.5); }
+  .slide.closing .slide-footer .brand { color: #f7f3ec; }
+
+  /* ===== UI ===== */
+  .ui {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px;
+    z-index: 50; opacity: .78; transition: opacity .3s;
+  }
+  .ui:hover { opacity: 1; }
+  .ui button {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid rgba(241,184,75,0.58);
+    background: rgba(31,38,36,0.82);
+    backdrop-filter: blur(10px);
+    color: var(--gold); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; transition: all .25s; font-family: inherit;
+    box-shadow: 0 10px 24px rgba(18,32,36,0.18);
+  }
+  .ui button:hover { background: var(--gold); color: #14261e; transform: scale(1.08); }
+  .ui .counter {
+    font-family: Georgia, serif; color: var(--gold); font-size: 18px;
+    letter-spacing: .12em; min-width: 104px; text-align: center;
+    background: rgba(31,38,36,0.82); backdrop-filter: blur(10px);
+    border: 1px solid rgba(241,184,75,0.45);
+    border-radius: 26px; padding: 15px 0;
+    box-shadow: 0 10px 24px rgba(18,32,36,0.18);
+  }
+
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--terracotta), var(--gold), var(--sky));
+    z-index: 60; transition: width .45s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 0 12px rgba(198,154,78,0.5);
+  }
+
+  .notes {
+    position: fixed; left: 0; right: 0; bottom: 0; max-height: 42vh;
+    background: rgba(20,16,12,0.96); backdrop-filter: blur(14px);
+    color: #e8e0d0; padding: 24px 6vw 30px;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.2,.8,.2,1);
+    z-index: 55; overflow-y: auto;
+    border-top: 2px solid var(--gold);
+  }
+  .notes.open { transform: translateY(0); }
+  .notes .notes-head {
+    font-size: 11px; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .notes .notes-head::after { content: ''; flex: 1; height: 1px; background: rgba(198,154,78,0.25); }
+  .notes p { font-size: clamp(13px, 1.1vw, 15.5px); line-height: 1.75; color: rgba(232,224,208,0.85); max-width: 92ch; }
+  .notes p + p { margin-top: 1em; }
+
+  /* loading shimmer for images */
+  .img-frame.loading::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: shimmer 1.6s infinite;
+    z-index: 0;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @media (max-width: 900px) {
+    .content.two-col { grid-template-columns: 1fr; gap: 2.5vh; }
+    .content.two-col.reverse { grid-template-columns: 1fr; }
+    .content.two-col.reverse .img-side { order: -1; }
+    .cards.c3, .cards.c4 { grid-template-columns: 1fr 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .slide { padding: 4vh 6vw 10vh; }
+    .slide.cover { padding: 0 8vw 10vh; }
+    .img-side { min-height: 200px; }
+  }
+  @media (max-width: 640px) {
+    .cards.c2, .cards.c3, .cards.c4 { grid-template-columns: 1fr; }
+    .ui { bottom: 14px; gap: 8px; }
+    .ui button { width: 44px; height: 44px; font-size: 19px; }
+    .ui .counter { min-width: 88px; font-size: 15px; padding: 12px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1 — COVER ============ -->
+  <section class="slide cover active" data-notes="წარმოიდგინეთ, რომ საქართველოში პირველად ჩამოხვედით. ინტერნეტში იპოვით სასტუმროს, ტურს, მანქანას და ათასობით ლამაზ ფოტოს. მაგრამ სად იპოვით ოჯახს, რომელიც იმ საღამოს სუფრასთან მიგიწვევთ? Stumrad.ge იწყება ამ ადგილიდან.">
+    <div class="cover-bg bg-img">
+      <img src="assets/cover.jpg"
+           alt="ქართული ოჯახი სტუმრებს სოფლის ეზოში ხვდება" loading="lazy">
+    </div>
+    <div class="content">
+      <div class="eyebrow">Fundraising &amp; Storytelling</div>
+      <h1>საქართველო, რომელსაც <span>უბრალოდ ვერ დაჯავშნი</span></h1>
+      <p class="lede">ერთი ოჯახი. ერთი საღამო. ერთი ნამდვილი მოგონება.</p>
+      <!-- <div class="meta">
+        <div><b>Investor</b> შეხვედრამდე მოსამზადებელი ვერსია</div>
+        <div><b>13</b> სლაიდი</div>
+        <div><b>Stumrad.ge</b> 2026</div>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2 — GUEST STORY ============ -->
+  <section class="slide" data-notes="მოვუყვეთ ელენეს ამბავს. ელენე ევროპიდან ჩამოვიდა. ის თბილისიდან ყაზბეგისკენ მიდის. გზაში ხედავს არაგვის ხეობას, სოფლებს, ეზოებს, ცეცხლზე მომზადებულ საჭმელს. მას სურს გაჩერდეს. არა მხოლოდ ფოტო გადაიღოს. მას უნდა, დაჯდეს ოჯახთან, გაიგოს მათი ამბები და ერთი დღე ისე გაატაროს, როგორც ადგილობრივები ატარებენ. მაგრამ ელენემ არ იცის, ვის უნდა დაუკავშირდეს. არ იცის, ვინ დახვდება. არ იცის, რეალურად რა პირობებია იმ სახლში. ამიტომ ის გზას აგრძელებს.">
+    <div class="kicker"><span class="num">02</span> სტუმრის ამბავი <span class="bar"></span></div>
+    <div class="content two-col">
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">ელენე თბილისიდან ყაზბეგისკენ მიდის</h2>
+        <div class="quote-block">
+          <p>„მინდა საქართველო ვიგრძნო,<br>არა მხოლოდ ვნახო“</p>
+        </div>
+        <p class="body-text">
+          გზაში ხედავს არაგვის ხეობას, სოფლებს, ეზოებს, ცეცხლზე მომზადებულ საჭმელს. მას სურს გაჩერდეს — არა მხოლოდ ფოტო გადაიღოს, არამედ დაჯდეს ოჯახთან და ერთი დღე ისე გაატაროს, როგორც ადგილობრივები ატარებენ.
+        </p>
+        <p class="body-text" style="color:var(--terracotta); font-weight:600; margin-top:1.5vh;">
+          მაგრამ ელენემ არ იცის, ვის უნდა დაუკავშირდეს. ამიტომ ის გზას აგრძელებს.
+        </p>
+      </div>
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">მთის გზა — არაგვის ხეობა</div>
+          <img src="assets/guest-road.jpg"
+               alt="მთის გზა არაგვის ხეობაში" loading="lazy">
+        </div>
+        <div class="caption">მთის გზა თბილისიდან ყაზბეგისკენ</div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>02 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — FAMILY STORY ============ -->
+  <section class="slide" data-notes="იმავე გზაზე ცხოვრობს ნინოს ოჯახი. მათ აქვთ სახლი, ეზო, ადგილობრივი სამზარეულო და ცოდნა, რომელიც თაობებს გადაეცემოდა. შეუძლიათ სტუმარს ასწავლონ პურის ცხობა, აჩვენონ ყველის დამზადება ან უბრალოდ გაუზიარონ ჩვეულებრივი ოჯახური საღამო. მაგრამ ნინოს ოჯახს არ აქვს მარტივი გზა უცხო სტუმრამდე.">
+    <div class="kicker"><span class="num">03</span> ოჯახის ამბავი <span class="bar"></span></div>
+    <div class="content two-col reverse">
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">ოჯახური სამზარეულო — პურის ცხობა</div>
+          <img src="assets/host-bread.jpg"
+               alt="პურის ცხობა ქართულ ოჯახში" loading="lazy">
+        </div>
+        <div class="caption">ნინოს ოჯახი — ადგილობრივი სამზარეულო</div>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">იმავე გზაზე ნინოს ოჯახი ცხოვრობს</h2>
+        <p class="body-text">
+          მათ აქვთ სახლი, ეზო, ადგილობრივი სამზარეულო და ცოდნა, რომელიც თაობებს გადაეცემოდა. შეუძლიათ ასწავლონ პურის ცხობა, აჩვენონ ყველის დამზადება ან უბრალოდ გაუზიარონ ოჯახური საღამო.
+        </p>
+        <div class="cards" style="margin-top:2vh; gap:1vh;">
+          <div class="card" style="padding:1.4vh 1.2vw;">
+            <h3 style="font-size:clamp(13px,1.15vw,16px); margin-bottom:.3vh;">ენის ბარიერი</h3>
+            <p style="font-size:clamp(11px,.9vw,13.5px);">უცხო ენაზე კომუნიკაცია რთულია.</p>
+          </div>
+          <div class="card" style="padding:1.4vh 1.2vw;">
+            <h3 style="font-size:clamp(13px,1.15vw,16px); margin-bottom:.3vh;">ნდობის ბარიერი</h3>
+            <p style="font-size:clamp(11px,.9vw,13.5px);">უცნობი ადამიანის სახლში მიღება ნდობას მოითხოვს.</p>
+          </div>
+          <div class="card" style="padding:1.4vh 1.2vw;">
+            <h3 style="font-size:clamp(13px,1.15vw,16px); margin-bottom:.3vh;">ბიუროკრატია</h3>
+            <p style="font-size:clamp(11px,.9vw,13.5px);">ტურისტულ ბიზნესად დარეგისტრირება ზედმეტად რთული ჩანს.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>03 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — MISSING LINK ============ -->
+  <section class="slide" data-notes="დღეს ეს კავშირი ორ უკიდურესობას შორის იკარგება. ერთ მხარეს არის წინასწარ შეფუთული ტური. სტუმარი მიჰყვება გრაფიკს, ხედავს იმავეს, რასაც ყველა ხედავს, და ადგილთან პირადი ურთიერთობის დრო ხშირად აღარ რჩება. მეორე მხარეს არის შემთხვევითი Facebook-პოსტი ან ნაცნობის რეკომენდაცია.">
+    <div class="kicker"><span class="num">04</span> დაკარგული კავშირი <span class="bar"></span></div>
+    <div class="content">
+      <h2 class="subtitle">მოთხოვნა არსებობს. შესაძლებლობაც არსებობს. აკლია უსაფრთხო კავშირი.</h2>
+      <div class="compare-grid">
+        <div class="compare-item">
+          <div class="img-frame loading">
+            <div class="fallback">ტურისტული ავტობუსი</div>
+            <img src="assets/tour-bus.jpg"
+                 alt="ტურისტული ავტობუსი" loading="lazy">
+          </div>
+          <div class="compare-text">
+            <h3>წინასწარ შეფუთული ტური <span class="tag bad">ერთი უკიდურესობა</span></h3>
+            <p>სტუმარი მიჰყვება გრაფიკს, ხედავს იმავეს, რასაც ყველა — ადგილთან პირადი ურთიერთობის დრო აღარ რჩება.</p>
+          </div>
+        </div>
+        <div class="compare-item">
+          <div class="img-frame loading">
+            <div class="fallback">სოციალური მედია</div>
+            <img src="assets/social-phone.jpg"
+                 alt="სოციალური მედია" loading="lazy">
+          </div>
+          <div class="compare-text">
+            <h3>შემთხვევითი Facebook-პოსტი <span class="tag bad">მეორე უკიდურესობა</span></h3>
+            <p>შეიძლება გაჩნდეს კარგი შეხვედრა, მაგრამ არ არსებობს ნდობის, გადახდისა და უსაფრთხოების მკაფიო წესები.</p>
+          </div>
+        </div>
+      </div>
+      <div class="quote-block" style="margin-top:1.5vh;">
+        <p>Stumrad.ge ამ ორ ადამიანს აძლევს ერთმანეთის პოვნის გზას.</p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>04 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — WHY MTSKHETA-MTIANETI ============ -->
+  <section class="slide" data-notes="მცხეთა-მთიანეთი შემთხვევით არ აგვირჩევია. თბილისიდან სტეფანწმინდისკენ მიმავალ გზაზე ერთ რეგიონში ხვდება საქართველოს რამდენიმე სახე: მცხეთის ისტორიული მემკვიდრეობა, ანანური, არაგვის ხეობა, გუდაურის ზამთრის სეზონი, ყაზბეგის მთები და ფშავ-ხევსურეთის ტრადიციული სოფლები.">
+    <div class="kicker"><span class="num">05</span> რატომ მცხეთა-მთიანეთი <span class="bar"></span></div>
+    <div class="content">
+      <h2 class="subtitle">ერთი რეგიონი, ბევრი საქართველო</h2>
+      <div class="cards c4" style="flex:1;">
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">მცხეთა — ჯვრის მონასტერი</div>
+            <img src="assets/jvari.jpg"
+                 alt="მცხეთა — ჯვრის მონასტერი" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>მცხეთა</h3>
+            <p>ისტორია და სულიერი მემკვიდრეობა</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">ანანურის ციხე</div>
+            <img src="assets/ananuri.jpg"
+                 alt="ანანურის ციხე" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>არაგვის ხეობა და ანანური</h3>
+            <p>გზა, სოფელი და ოჯახური სამზარეულო</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">გუდაური — თოვლიანი მთები</div>
+            <img src="assets/gudauri.jpg"
+                 alt="გუდაური" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>გუდაური და ყაზბეგი</h3>
+            <p>ზამთარი, მთა და აქტიური მოგზაურობა</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">ხევსურეთი — კოშკები</div>
+            <img src="assets/shatili.jpg"
+                 alt="ფშავ-ხევსურეთი" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>ფშავ-ხევსურეთი</h3>
+            <p>ცოცხალი ტრადიცია და განსაკუთრებული სოფლები</p>
+          </div>
+        </div>
+      </div>
+      <p class="body-text" style="font-size:clamp(10px,.82vw,12px); margin-top:1vh; color:#9b8f7c;">
+        მცხეთის ისტორიული ძეგლები UNESCO-ს მსოფლიო მემკვიდრეობის სიაშია 1994 წლიდან. წყარო: UNESCO
+      </p>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>05 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — TOURISM POTENTIAL ============ -->
+  <section class="slide hero-bg" data-notes="2025 წელს საქართველოში 7.8 მილიონი საერთაშორისო ვიზიტი დაფიქსირდა. მათგან 5.52 მილიონი ტურისტული ვიზიტი იყო. ეს არ ნიშნავს, რომ ყველა ეს ადამიანი Stumrad.ge-ის მომხმარებელი იქნება. არც უნდა ვიფიქროთ ასე. ეს ნიშნავს, რომ ტურისტული ნაკადი უკვე არსებობს.">
+    <div class="bg-img">
+      <img src="assets/tourism.jpg"
+           alt="ტურისტები საქართველოში" loading="lazy">
+    </div>
+    <div class="kicker"><span class="num">06</span> ტურისტული პოტენციალი და რეალობა <span class="bar"></span></div>
+    <div class="content two-col">
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">ტურისტი უკვე აქ არის</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="value">7.8<span> მლნ</span></div>
+            <div class="label">საერთაშორისო ვიზიტი საქართველოში, 2025</div>
+          </div>
+          <div class="stat">
+            <div class="value">5.52<span> მლნ</span></div>
+            <div class="label">ტურისტული ვიზიტი საქართველოში, 2025</div>
+          </div>
+        </div>
+        <p class="body-text">ეს არ ნიშნავს, რომ ყველა ეს ადამიანი ჩვენი მომხმარებელი იქნება. ეს ნიშნავს, რომ ტურისტული ნაკადი უკვე არსებობს.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center; gap:1.5vh;">
+        <div class="card">
+          <div class="c-icon">✓</div>
+          <h3>მცხეთა-მთიანეთში პოტენციალი არსებობს</h3>
+          <p>სტუმარი გზაში მხოლოდ პეიზაჟს არ ხედავს — ხედავს ოჯახურ და კულტურულ ცხოვრებასაც.</p>
+        </div>
+        <div class="card">
+          <div class="c-icon">!</div>
+          <h3>პირველი პილოტი უნდა იყოს ფრთხილი</h3>
+          <p>გზის ხელმისაწვდომობა, სეზონურობა, ჰოსტის მზადყოფნა და უსაფრთხოება შევაფასოთ თითოეულ ადგილას.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>06 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7 — PROMISE ============ -->
+  <section class="slide" data-notes="Stumrad.ge არ ჰპირდება ტურისტს იდეალურ ავთენტურობას. ის ჰპირდება სიმართლეს. სტუმარი წინასწარ ხედავს, სად მიდის, რა პირობებია სახლში და რას მოიცავს გამოცდილება. ოჯახი წინასწარ იცის, ვინ არის სტუმარი და როგორ მუშაობს გადახდა.">
+    <div class="kicker"><span class="num">07</span> Stumrad.ge-ის დაპირება <span class="bar"></span></div>
+    <div class="content two-col">
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">ნამდვილი მასპინძლობა. გასაგები პირობებით. ორივე მხარის ნდობით.</h2>
+        <div class="quote-block">
+          <p>„Stumrad.ge არ ჰპირდება ტურისტს იდეალურ ავთენტურობას. ის ჰპირდება სიმართლეს.“</p>
+        </div>
+        <div class="cards c2" style="gap:1.2vh; margin-top:1vh;">
+          <div class="card" style="padding:1.6vh 1.1vw;">
+            <div class="c-icon">◈</div>
+            <h3 style="font-size:clamp(13px,1.15vw,16px);">სტუმარი წინასწარ ხედავს</h3>
+            <p style="font-size:clamp(11px,.92vw,13.5px);">სად მიდის, რა პირობებია სახლში და რას მოიცავს გამოცდილება.</p>
+          </div>
+          <div class="card" style="padding:1.6vh 1.1vw;">
+            <div class="c-icon">◈</div>
+            <h3 style="font-size:clamp(13px,1.15vw,16px);">ოჯახი წინასწარ იცის</h3>
+            <p style="font-size:clamp(11px,.92vw,13.5px);">ვინ არის სტუმარი და როგორ მუშაობს გადახდა.</p>
+          </div>
+        </div>
+      </div>
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">ხელის ჩამორთმევა — ნდობა</div>
+          <img src="assets/trust-host.jpg"
+               alt="ნდობა და მასპინძლობა" loading="lazy">
+        </div>
+        <div class="caption">მასპინძლობა იწყება ნდობით</div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>07 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — GUEST DISCOVERY ============ -->
+  <section class="slide" data-notes="სტუმარი Stumrad.ge-ზე არ ეძებს მხოლოდ დასაძინებელ ადგილს. მას შეუძლია აირჩიოს ოჯახური სუფრა, პურის ცხობა, ყველის მომზადება, ფერმის საქმე, ცხენით გასეირნება ან ღამის გათევა სოფელში. ოჯახი ამ დროს არ ქმნის ხელოვნურ სანახაობას.">
+    <div class="kicker"><span class="num">08</span> რას აღმოაჩენს სტუმარი <span class="bar"></span></div>
+    <div class="content">
+      <h2 class="subtitle">სტუმარი ირჩევს ცხოვრებაში ჩართვას</h2>
+      <div class="cards c3" style="flex:1;">
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">ოჯახური სუფრა</div>
+            <img src="assets/supra.jpg"
+                 alt="ოჯახური სუფრა" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>ოჯახური სუფრა</h3>
+            <p>ადგილობრივი კერძები და საუბარი</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">ხელობა და ფერმა</div>
+            <img src="assets/craft-food.jpg"
+                 alt="პური და ყველი" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>ხელობა და ფერმა</h3>
+            <p>პური, ყველი, მოსავალი, ყოველდღიური საქმე</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">სახლი და სოფელი</div>
+            <img src="assets/village-stay.jpg"
+                 alt="სოფელი მთაში" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>სახლი და სოფელი</h3>
+            <p>ღამის გათევა, ბუნება, სეზონური გამოცდილება</p>
+          </div>
+        </div>
+      </div>
+      <p class="body-text" style="margin-top:1vh;">
+        ოჯახი არ ქმნის ხელოვნურ სანახაობას — ის სტუმარს სთავაზობს იმას, რაც უკვე აქვს: საკუთარ დროს, ცოდნას, სახლს და ცხოვრების წესს.
+      </p>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>08 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — TRUST & LANGUAGE ============ -->
+  <section class="slide" data-notes="ასეთი პლატფორმის მთავარი საკითხი ნდობაა. სტუმარმა უნდა იცოდეს, სად დაიძინებს, არის თუ არა გათბობა, ცხელი წყალი, ინტერნეტი და რა პირობები დახვდება ადგილზე. ოჯახმაც უნდა იცოდეს, ვინ მოდის მის სახლში. საჭიროა იდენტობის დადასტურება, ორმხრივი შეფასება და გადახდის დაცული პროცესი.">
+    <div class="kicker"><span class="num">09</span> ნდობა და ენა <span class="bar"></span></div>
+    <div class="content two-col reverse">
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">ვერიფიკაცია და უსაფრთხო გადახდა</div>
+          <img src="assets/security-app.jpg"
+               alt="ვერიფიკაცია და უსაფრთხოება" loading="lazy">
+        </div>
+        <div class="caption">იდენტობის დადასტურება და დაცული გადახდა</div>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">შეხვედრამდე ორივემ უნდა იცოდეს:</h2>
+        <div class="steps">
+          <div class="step"><div class="dot">1</div><div><h4>ვის ხვდება</h4><p>იდენტობის დადასტურება</p></div></div>
+          <div class="step"><div class="dot">2</div><div><h4>სად მიდის</h4><p>ლოკაცია და გარემო</p></div></div>
+          <div class="step"><div class="dot">3</div><div><h4>რა პირობებია</h4><p>გათბობა, ცხელი წყალი, ინტერნეტი</p></div></div>
+          <div class="step"><div class="dot">4</div><div><h4>როგორ არის დაცული გადახდა</h4><p>უსაფრთხო ტრანზაქცია და ორმხრივი შეფასება</p></div></div>
+        </div>
+        <p class="body-text" style="margin-top:1.5vh; font-size:clamp(12px,1vw,14.5px); font-style:italic; color:var(--deep);">
+          ენა მხოლოდ სიტყვები არ არის — <em style="color:var(--terracotta);">„ჩვენი სუფრაა, არაფერი მოიტანო“</em> — სიტყვასიტყვით თარგმანი საკმარისი არ არის. სტუმარმა უნდა გაიგოს კონტექსტიც.
+        </p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>09 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10 — WHERE WE ARE ============ -->
+  <section class="slide" data-notes="Stumrad.ge დღეს მხოლოდ იდეა აღარ არის. არსებობს სამენოვანი MVP, გამოცდილებების კატეგორიები და ნდობის მექანიზმების პროტოტიპი. მაგრამ MVP არ ნიშნავს, რომ პროდუქტი დამტკიცებულია. შემდეგი მნიშვნელოვანი ნაბიჯია, რომ რეალურმა ტურისტებმა და რეალურმა ოჯახებმა გამოიყენონ ეს სისტემა.">
+    <div class="kicker"><span class="num">10</span> სად ვართ დღეს <span class="bar"></span></div>
+    <div class="content two-col">
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">MVP უკვე არსებობს</h2>
+        <ul class="fancy">
+          <li><strong>ქართული, ინგლისური და რუსული</strong> ინტერფეისი</li>
+          <li><strong>30-ზე მეტი</strong> გამოცდილების სცენარი</li>
+          <li><strong>ნდობისა და შეფასების</strong> მექანიზმების პროტოტიპი</li>
+        </ul>
+        <div class="card" style="background:linear-gradient(135deg, var(--deep), var(--deep-light)); border:none; color:#f7f3ec; padding:2.4vh 1.4vw; margin-top:2.5vh;">
+          <div class="c-icon" style="background:linear-gradient(135deg, var(--gold), var(--terracotta));">→</div>
+          <h3 style="color:#f7f3ec; font-size:clamp(16px,1.5vw,21px); margin-bottom:.8vh;">შემდეგი ნაბიჯი: რეალური პილოტი</h3>
+          <p style="color:rgba(247,243,236,0.78); font-size:clamp(12px,1vw,14.5px);">
+            MVP არ ნიშნავს, რომ პროდუქტი დამტკიცებულია. მხოლოდ რეალური ტურისტებისა და ოჯახების გამოყენების შემდეგ გავიგებთ, რა მუშაობს.
+          </p>
+        </div>
+      </div>
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">MVP — აპლიკაციის ინტერფეისი</div>
+          <img src="assets/mvp-app.jpg"
+               alt="MVP — აპლიკაციის ინტერფეისი" loading="lazy">
+        </div>
+        <div class="caption">სამენოვანი MVP — ქართული, ინგლისური, რუსული</div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>10 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 11 — WHAT TO PROVE ============ -->
+  <section class="slide" data-notes="Investor შეხვედრამდე ჩვენ არ გვინდა მხოლოდ ლამაზი იდეით მისვლა. გვინდა პასუხებით მისვლა. ვინ არის პირველი მომხმარებელი? რომელი გამოცდილება მუშაობს? რა ბარიერი რჩება ნდობის მიუხედავად?">
+    <div class="kicker"><span class="num">11</span> რა უნდა დამტკიცდეს Investor შეხვედრამდე <span class="bar"></span></div>
+    <div class="content two-col reverse">
+      <div class="img-side">
+        <div class="img-frame loading">
+          <div class="fallback">მონაცემები და ანალიზი</div>
+          <img src="assets/analytics.jpg"
+               alt="მონაცემები და ანალიზი" loading="lazy">
+        </div>
+        <div class="caption">პილოტის მონაცემები — გაზომვადი შედეგები</div>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h2 class="subtitle">ჩვენ გვჭირდება პასუხები</h2>
+        <ul class="fancy" style="margin-top:1.5vh;">
+          <li>რამდენი ოჯახი ჩაერთვება პირველ პილოტში</li>
+          <li>რომელი გამოცდილება არის ყველაზე მოთხოვნადი</li>
+          <li>რისი ეშინია სტუმარს დაჯავშნამდე</li>
+          <li>რა დახმარება სჭირდება ჰოსტს პირველ ჯავშნამდე</li>
+          <li>რამდენჯერ სურთ მომხმარებლებს დაბრუნება</li>
+        </ul>
+        <p class="body-text" style="margin-top:2vh; font-style:italic; color:var(--deep); font-size:clamp(12px,1.05vw,15px);">
+          ეს კითხვები არა სისუსტეა, არამედ სწორად დაგეგმილი პილოტის საფუძველია.
+        </p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>11 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 12 — FIRST PILOT ============ -->
+  <section class="slide" data-notes="პირველი ეტაპის მიზანი არ არის სწრაფად ბევრი განცხადების შეგროვება. მიზანია მცირე, ხარისხიანი ქსელის შექმნა. ჩვენ უნდა შევძლოთ ერთი ოჯახის პირველი სტუმრის მიღება უსაფრთხოდ.">
+    <div class="kicker"><span class="num">12</span> პირველი პილოტი <span class="bar"></span></div>
+    <div class="content">
+      <h2 class="subtitle">მცირე ქსელი. რეალური შეხვედრები. გაზომვადი შედეგები.</h2>
+      <div class="cards c3" style="flex:1;">
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">პირველი ჰოსტები</div>
+            <img src="assets/pilot-hosts.jpg"
+                 alt="პირველი ჰოსტები" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>პირველი ჰოსტები</h3>
+            <p>მომზადებული და ხელმისაწვდომი ოჯახები</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">პირველი სტუმრები</div>
+            <img src="assets/pilot-guests.jpg"
+                 alt="პირველი სტუმრები" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>პირველი სტუმრები</h3>
+            <p>უსაფრთხო დაჯავშნა და მხარდაჭერა</p>
+          </div>
+        </div>
+        <div class="card img-card">
+          <div class="img-frame loading">
+            <div class="fallback">პირველი მტკიცებულება</div>
+            <img src="assets/pilot-proof.jpg"
+                 alt="პირველი მტკიცებულება" loading="lazy">
+          </div>
+          <div class="card-body">
+            <h3>პირველი მტკიცებულება</h3>
+            <p>შეფასება, განმეორებითი ჯავშანი, ოჯახის შემოსავალი</p>
+          </div>
+        </div>
+      </div>
+      <p class="body-text" style="margin-top:1vh;">
+        მიზანია ერთი ოჯახის პირველი სტუმრის მიღება უსაფრთხოდ — და შემდეგ გავიგოთ, კმაყოფილია თუ არა სტუმარი, რეკომენდაციას უწევს თუ არა და სურს თუ არა ოჯახს პროცესის გამეორება.
+      </p>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>12 / 13</span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13 — CLOSING ============ -->
+  <section class="slide closing" data-notes="დღეს ჩვენ არ გთხოვთ საინვესტიციო გადაწყვეტილებას. გვჭირდება თქვენი კრიტიკული ხედვა. სად არის ეს ამბავი ყველაზე ძლიერი? სად არის ჯერ ჰიპოთეზა? რომელი მონაცემი იქნება გადამწყვეტი Investor-ისთვის?">
+    <div class="bg-img">
+      <img src="assets/closing.jpg"
+           alt="საქართველოს მთები" loading="lazy">
+    </div>
+    <div class="kicker"><span class="num">13</span> რა გვჭირდება თქვენგან დღეს <span class="bar"></span></div>
+    <div class="content">
+      <h1 class="title" style="color:#f7f3ec; max-width:22ch;">
+        გვჭირდება <em>სწორი კითხვები</em>
+      </h1>
+      <p class="body-text" style="font-size:clamp(15px,1.45vw,21px); color:rgba(247,243,236,0.8); font-family:Georgia, serif; font-style:italic; max-width:40ch;">
+        რომ Investor შეხვედრაზე გვქონდეს არა მხოლოდ ძლიერი ამბავი, არამედ დამტკიცებული პასუხები.
+      </p>
+      <p class="body-text" style="margin-top:2.5vh; max-width:60ch;">
+        დღეს ჩვენ არ გთხოვთ საინვესტიციო გადაწყვეტილებას. გვჭირდება თქვენი კრიტიკული ხედვა — სად არის ეს ამბავი ყველაზე ძლიერი, სად არის ჯერ ჰიპოთეზა და რომელი მონაცემი იქნება გადამწყვეტი.
+      </p>
+      <p style="margin-top:3.5vh; font-family:Georgia, serif; font-size:clamp(18px,1.75vw,25px); color:var(--gold); font-style:italic;">
+        Stumrad.ge — საქართველო, რომელსაც უბრალოდ ვერ დაჯავშნი.
+      </p>
+    </div>
+    <div class="slide-footer">
+      <span class="brand">Stumrad<span>.ge</span></span>
+      <span>13 / 13</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="ui">
+  <button id="prev" title="წინა (←)">‹</button>
+  <div class="counter" id="counter">1 / 13</div>
+  <button id="next" title="შემდეგი (→)">›</button>
+  <button id="notesBtn" title="მომხსენებლის ტექსტი (N)">N</button>
+</div>
+
+<div class="notes" id="notes">
+  <div class="notes-head">მომხსენებლის ტექსტი</div>
+  <div id="notesContent"></div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const notes = document.getElementById('notes');
+  const notesContent = document.getElementById('notesContent');
+  let current = 0;
+
+  // === Image loading handler ===
+  const backupImages = [
+    'assets/cover.jpg',
+    'assets/guest-road.jpg',
+    'assets/host-bread.jpg',
+    'assets/tour-bus.jpg',
+    'assets/social-phone.jpg',
+    'assets/jvari.jpg',
+    'assets/ananuri.jpg',
+    'assets/gudauri.jpg',
+    'assets/shatili.jpg',
+    'assets/tourism.jpg',
+    'assets/trust-host.jpg',
+    'assets/supra.jpg',
+    'assets/craft-food.jpg',
+    'assets/village-stay.jpg',
+    'assets/security-app.jpg',
+    'assets/mvp-app.jpg',
+    'assets/analytics.jpg',
+    'assets/pilot-hosts.jpg',
+    'assets/pilot-guests.jpg',
+    'assets/pilot-proof.jpg',
+    'assets/closing.jpg'
+  ];
+
+  document.querySelectorAll('img').forEach((img, i) => {
+    if (backupImages[i]) img.dataset.backupSrc = backupImages[i];
+  });
+
+  document.querySelectorAll('.img-frame').forEach(frame => {
+    const img = frame.querySelector('img');
+    if (!img) return;
+
+    const onLoaded = () => {
+      img.classList.add('loaded');
+      frame.classList.add('has-image');
+      frame.classList.remove('loading');
+    };
+
+    const onError = () => {
+      if (img.dataset.backupSrc && img.src !== img.dataset.backupSrc) {
+        img.src = img.dataset.backupSrc;
+        return;
+      }
+      frame.classList.remove('loading');
+      frame.classList.add('has-error');
+    };
+
+    if (img.complete && img.naturalWidth > 0) {
+      onLoaded();
+    } else {
+      img.addEventListener('load', onLoaded);
+      img.addEventListener('error', onError);
+      if (img.complete && img.naturalWidth === 0) onError();
+    }
+  });
+
+  // === Hero/closing bg images ===
+  document.querySelectorAll('.bg-img img').forEach(img => {
+    const onLoaded = () => img.classList.add('loaded');
+    const onError = () => {
+      if (img.dataset.backupSrc && img.src !== img.dataset.backupSrc) {
+        img.src = img.dataset.backupSrc;
+      }
+    };
+    if (img.complete && img.naturalWidth > 0) {
+      onLoaded();
+    } else {
+      img.addEventListener('load', onLoaded);
+      img.addEventListener('error', onError);
+      if (img.complete && img.naturalWidth === 0) onError();
+    }
+  });
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    progress.style.width = ((current + 1) / slides.length * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    notesContent.innerHTML = (slides[current].dataset.notes || '—')
+      .split('\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+  }
+
+  function go(n) {
+    current = Math.max(0, Math.min(slides.length - 1, n));
+    render();
+  }
+
+  document.getElementById('next').onclick = () => go(current + 1);
+  document.getElementById('prev').onclick = () => go(current - 1);
+  document.getElementById('notesBtn').onclick = () => notes.classList.toggle('open');
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(current + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key.toLowerCase() === 'n') notes.classList.toggle('open');
+    else if (e.key === 'Escape') notes.classList.remove('open');
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) go(current + (dx < 0 ? 1 : -1));
+  });
+
+  render();
+</script>
+</body>
+</html>

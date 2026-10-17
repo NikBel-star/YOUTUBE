@@ -13,7 +13,6 @@ DockerKa.html
 ნაბიჯი 2: description.txt
 - YouTube ვიდეოს აღწერა (KA + EN)
 - ჰეშტაგები
-- შენ მომაწვდი შინაარსს
 ნაბიჯი 3: HTML ფაილები (მოგვიანებით)
 - DockerEn.html / DockerKa.html
 - იგივე card/grid დიზაინი
